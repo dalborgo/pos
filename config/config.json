@@ -1,0 +1,11 @@
+{
+    "couchbase": {
+        "server": "couchbase://localhost",
+        "bucket": "risto"
+    },
+    "printer": {
+        "ip": "10.0.0.115"
+    },
+    "salt":"borgoshow",
+    "spec":"http://www.dalborgo.it/spec.json"
+}
