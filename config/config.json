@@ -1,11 +1,19 @@
 {
-    "couchbase": {
-        "server": "couchbase://localhost",
-        "bucket": "risto"
-    },
-    "printer": {
-        "ip": "10.0.0.115"
-    },
-    "salt":"borgoshow",
-    "spec":"http://www.dalborgo.it/spec.json"
+  "couchbase_": {
+    "server": "couchbase://10.0.2.28",
+    "bucket": "afame",
+    "sync_server": "10.0.2.28:4985",
+    "sync_db": "afame"
+  },
+  "couchbase": {
+    "server": "couchbase://localhost",
+    "bucket": "risto",
+    "sync_server": "localhost:4985",
+    "sync_db": "risto"
+  },
+  "printer": {
+    "ip": "10.0.0.115"
+  },
+  "salt": "borgoshow",
+  "spec": "http://localhost:3000/sync-gateway-public.json"
 }

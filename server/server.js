@@ -46,7 +46,7 @@ app.use(function (req, res, next) {
     next();
 });
 
-const user = require("./routes/table_room")(app);
+const user = require("./routes/sync")(app);
 
 ottoman.store = module.exports.store;
 
