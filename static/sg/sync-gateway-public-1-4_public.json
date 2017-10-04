@@ -675,6 +675,11 @@
       }
     },
     "/{db}/_bulk_docs": {
+      "parameters": [
+        {
+          "$ref": "#/parameters/db"
+        }
+      ],
       "post": {
         "tags": [
           "database"
@@ -684,9 +689,6 @@
         "parameters": [
           {
             "$ref": "#/parameters/bulkdocs"
-          },
-          {
-          "$ref": "#/parameters/db"
           }
         ],
         "responses": {
@@ -726,6 +728,11 @@
       }
     },
     "/{db}/_bulk_get": {
+      "parameters": [
+        {
+          "$ref": "#/parameters/db"
+        }
+      ],
       "post": {
         "tags": [
           "database"
@@ -744,9 +751,6 @@
           },
           {
             "$ref": "#/parameters/bulkget"
-          },
-          {
-            "$ref": "#/parameters/db"
           }
         ],
         "responses": {
@@ -851,11 +855,6 @@
       }
     },
     "/{db}/_changes": {
-      "parameters": [
-        {
-          "$ref": "#/parameters/db"
-        }
-      ],
       "get": {
         "tags": [
           "database"
@@ -893,6 +892,9 @@
           },
           {
             "$ref": "#/parameters/timeout"
+          },
+          {
+            "$ref": "#/parameters/db"
           }
         ],
         "summary": "Changes",
@@ -928,14 +930,6 @@
       }
     },
     "/{db}/{doc}": {
-      "parameters": [
-        {
-          "$ref": "#/parameters/db"
-        },
-        {
-          "$ref": "#/parameters/doc"
-        }
-      ],
       "get": {
         "tags": [
           "document"
@@ -955,6 +949,11 @@
           },
           {
             "$ref": "#/parameters/show_exp"
+          },{
+            "$ref": "#/parameters/db"
+          },
+          {
+            "$ref": "#/parameters/doc"
           }
         ],
         "summary": "Get document",
@@ -1522,14 +1521,14 @@
       }
     },
     "/{db}/": {
+      "parameters": [
+        {
+          "$ref": "#/parameters/db"
+        }
+      ],
       "get": {
         "tags": [
           "database"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/db"
-          }
         ],
         "summary": "Database info",
         "description": "This request retrieves information about the database.\n",
@@ -1563,9 +1562,6 @@
             "schema": {
               "type": "object"
             }
-          },
-          {
-          "$ref": "#/parameters/db"
           }
         ],
         "responses": {

@@ -13,7 +13,7 @@ import config from '../config/config.json';
 const app = express();
 app.use(express.static('static'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+//app.use(bodyParser.urlencoded({extended: true}));
 const CouchbaseStore = require('connect-couchbase')(session);
 const couchbaseStore = new CouchbaseStore({
     bucket: config.couchbase.bucket,               //optional
@@ -55,6 +55,7 @@ ottoman.ensureIndices(function (error) {
         console.log(error);
     }
     const server = app.listen(3000, function () {
+        console.log(config.couchbase);
         console.log("Listening on port %s...", server.address().port);
     });
 

@@ -1,6 +1,7 @@
 import Swagger from 'swagger-client';
+import fs from 'fs';
 import config from '../../config/config.json';
-import spec from '../../static/sg/sync-gateway-public-1-4_public.json';
+import spec from '../../static/sg/sync-gateway-public-1-3_public.json';
 import {v4} from 'uuid';
 
 spec.host = config.couchbase.sync_server;
@@ -9,31 +10,7 @@ new Swagger({
     spec: spec,
     usePromise: true
 }).then(function (res) {
-    client = res;
-    // Start getting changes at seq: 0
-    getChanges(0);
-
-    function getChanges(seq) {
-        // Use the Swagger client to connect to the changes feed
-        //filter: 'sync_gateway/bychannel',
-        //channels: 'notification',
-        client.apis.database.get__db___changes({db: 'risto', include_docs: true, active_only:true, since: seq, feed: 'longpoll', timeout: 0})
-            .then(function (res) {
-                const results = res.obj.results;
-                console.log(results.length + ' change(s) received');
-                processChanges(results);
-                getChanges(res.obj.last_seq);
-            })
-            .catch(function (err) {
-                console.log(err);
-            });
-    }
-    function processChanges(results) {
-        for (let i = 0; i < results.length; i++) {
-            const doc = results[i].doc;
-            console.log(doc);
-        }
-    }
+    client = res
 });
 
 const appRouter = function (app) {
@@ -46,6 +23,7 @@ const appRouter = function (app) {
             "display": "Attico",
             "rgb": [0, 0, 0],
             "image": "",
+            "index": 1,
             "tables": ["Table::" + v4(), "Table::" + v4()]
         };
         client.apis.document.post({db: config.couchbase.sync_db, body: body}).then(function (userRes) {
@@ -64,6 +42,7 @@ const appRouter = function (app) {
             "display": "Tavolo Esterno",
             "rgb": [0, 0, 0],
             "image": "",
+            "index": 1,
             "Room": "Room::143be1d0-5bf4-4b53-9836-5abe377a99dc"
         };
         client.apis.document.post({db: config.couchbase.sync_db, body: body}).then(function (userRes) {
@@ -84,6 +63,8 @@ const appRouter = function (app) {
                     "display": "Tavolo Grande",
                     "rgb": [0, 0, 0],
                     "image": "",
+                    "index": 1,
+                    "_rev": "1-4197c9093866d10ff2c4e6e63ae63d5d",
                     "Room": "Room::1d633c4c-5a24-4632-add8-eddb94ecc434"
                 }, {
                     "_id": "Table::6f5e484d-8e4f-41e6-9c68-40fc728e4eb0",
@@ -92,6 +73,8 @@ const appRouter = function (app) {
                     "display": "Tavolo Esterno",
                     "rgb": [0, 0, 0],
                     "image": "",
+                    "index": 1,
+                    "_rev": "1-cb24694463d95f6f06437676a454b60c",
                     "Room": "Room::1d633c4c-5a24-4632-add8-eddb94ecc434"
                 },
                 {
@@ -101,11 +84,14 @@ const appRouter = function (app) {
                     "display": "Attico",
                     "rgb": [0, 0, 0],
                     "image": "",
+                    "index": 1,
+                    "_rev": "1-22949e65aa1490b9e8d2d2014647eeca",
                     "tables": ["Table::76e6e4ea-7d00-4999-a75d-aeb46ffe5702", "Table::6f5e484d-8e4f-41e6-9c68-40fc728e4eb0"]
                 }
-            ]
+            ],
+            "new_edits": true
         };
-        client.apis.database.post__db___bulk_docs({
+        client.database.post_db_bulk_docs({
             db: config.couchbase.sync_db,
             BulkDocsBody: body
         }).then(function (userRes) {
@@ -116,21 +102,23 @@ const appRouter = function (app) {
         });
     });
 
-    app.get("/api/sync/table/bulk_get", function (req, res) {
-        let body = {
+
+    app.get("/api/bulk", function (req, res) {
+        const body = {
             "docs": [
                 {
-                    "id": "User::dalborgo2"
+                    "_id": "User::dalborgo",
+                    "_rev": "9-9e2b0815883fba686cd4a1c5af98a531",
                 }
-            ]
+            ],
+            "new_edits": true
         };
-        client.apis.database.post__db___bulk_get({
+        client.database.post_db_bulk_docs({
             db: config.couchbase.sync_db,
-            BulkGetBody: body,
-            attachments: false
+            BulkDocsBody: body
         }).then(function (userRes) {
-            //res.set('Content-Type', 'application/json');
-            res.send(new Buffer(userRes.text).toString());
+            console.log(body2);
+            res.json(userRes);
         }).catch(function (err) {
             console.log(err);
             res.send("error");
@@ -138,8 +126,48 @@ const appRouter = function (app) {
     });
 
 
+    app.get("/api/put", function (req, res) {
+        client.document.put_db_doc({
+            db: config.couchbase.sync_db, doc: "User::dalborgo", Document: {
+                "key": "value444",
+                "type": "foobar"
+            }, rev: "8-14e00f2f1059bca2d82cc65e2d8f03f5", new_edits: true
+        }).then(function (userRes) {
+            res.send(userRes)
+        })
+            .catch(function (err) {
+                console.log(err)
+            });
+    });
+
+    app.get("/api/sync/table/bulk_get", function (req, res) {
+        let body = {
+            "docs": [
+                {
+                    "id": "User::dalborgo"
+                }
+            ]
+        };
+        client.database.post_db_bulk_get({
+            db: config.couchbase.sync_db,
+            BulkGetBody: body
+        }).then(function (userRes) {
+            //res.send(new Buffer(userRes));
+        }).catch(function (err) {
+            console.log(err);
+            res.send("error");
+        });
+    });
+
     app.get("/api/sync/table/image", function (req, res) {
-        client.apis.attachment.get__db___doc___attachment_({
+        let body = {
+            "docs": [
+                {
+                    "id": "User::dalborgo"
+                }
+            ]
+        };
+        client.attachment.get_db_doc_attachment({
             db: config.couchbase.sync_db,
             doc: "User::dalborgo2",
             attachment: "image"
@@ -165,12 +193,58 @@ const appRouter = function (app) {
             "role": "administrator"
         };
         client.apis.document.post({db: config.couchbase.sync_db, body: body}).then(function (userRes) {
-            console.log(userRes);
+            console.log(userRes)
         }).catch(function (err) {
-            console.log(err);
+            console.log(err)
         });
         res.send(body)
     });
+
+
+    app.get("/api/sync/user/create_img", function (req, res) {
+        let type = "User";
+        let img = fs.readFileSync('./static/imgs/frak96.png');
+        let base64 = img.toString('base64');
+        let doc = {
+            "_id": type + "::dalborgo6",
+            "type": type,
+            "name": "Marco5",
+            "surname": "Dal Borgo",
+            "user": "dalborgo5",
+            "password": "12345",
+            "big_image": "",
+            "small_image": "",
+            "role": "administrator",
+            "_attachments" : {
+                "big_image": {
+                    "content_type": 'image\/png',
+                    "data": base64
+                }
+            }
+        };
+        client.database.post_db_bulk_docs({db: config.couchbase.sync_db, BulkDocsBody: {docs: [doc]}}).then(function (userRes) {
+            console.log(userRes);
+        }).catch(function (err) {
+            console.log(err)
+        });
+        res.send(doc)
+    });
+
+    app.get("/api/sync/user/read_img", function (req, res) {
+        client.document.get_db_doc({db: config.couchbase.sync_db, doc: "User::dalborgo6",attachments:true}).then(function (userRes) {
+            console.log(userRes);
+            const img = new Buffer(userRes.obj._attachments.big_image.data, 'base64');
+            res.writeHead(200, {
+                'Content-Type': 'image/png',
+                'Content-Length': img.length
+            });
+            res.end(img);
+            //res.send(userRes.obj._attachments.image)
+        }).catch(function (err) {
+            console.log(userRes)
+        });
+    });
+
     app.post("/api/sync/user/create", function (req, res) {
         let post = req.body;
         let type = "User";
