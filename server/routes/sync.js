@@ -11,7 +11,7 @@ new Swagger({
 }).then(function (res) {
     client = res;
     // Start getting changes at seq: 0
-    getChanges(0);
+   /* getChanges(0);
 
     function getChanges(seq) {
         // Use the Swagger client to connect to the changes feed
@@ -33,7 +33,7 @@ new Swagger({
             const doc = results[i].doc;
             console.log(doc);
         }
-    }
+    }*/
 });
 
 const appRouter = function (app) {
@@ -58,10 +58,10 @@ const appRouter = function (app) {
 
     app.get("/api/sync/table/create", function (req, res) {
         let body = {
-            "_id": "Table::e532a0d6-c59e-4610-a5fa-3226f73f46bc",
+            "_id": "Table::"+v4(),
             "type": "Table",
-            "name": "Table 2",
-            "display": "Tavolo Esterno",
+            "name": "Table 3",
+            "display": "Tavolo Esterno 2",
             "rgb": [0, 0, 0],
             "image": "",
             "Room": "Room::143be1d0-5bf4-4b53-9836-5abe377a99dc"
