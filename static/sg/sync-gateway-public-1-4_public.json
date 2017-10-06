@@ -1020,17 +1020,6 @@
       }
     },
     "/{db}/_design/{ddoc}/_view/{view}": {
-      "parameters": [
-        {
-          "$ref": "#/parameters/db"
-        },
-        {
-          "$ref": "#/parameters/ddoc"
-        },
-        {
-          "$ref": "#/parameters/view"
-        }
-      ],
       "get": {
         "tags": [
           "query"
@@ -1145,6 +1134,15 @@
             "name": "update_seq",
             "description": "Indicates whether to include the update_seq property in the response.",
             "type": "boolean"
+          },
+          {
+            "$ref": "#/parameters/db"
+          },
+          {
+            "$ref": "#/parameters/ddoc"
+          },
+          {
+            "$ref": "#/parameters/view"
           }
         ],
         "responses": {
