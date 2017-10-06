@@ -8,11 +8,11 @@ import spec from '../static/sg/sync-gateway-public-1-4_public.json';
 spec.host = config.couchbase.sync_server;
 
 const Table = (props) => (
-    <span>{props.tables.name}</span>
+    <span>{props.tables.key}</span>
 );
 
 function Container(props) {
-    let Tables = props.tables.map(tab => <Table key={tab._id} tables={tab}/>);
+    let Tables = props.tables.map(tab => <Table key={tab.id} tables={tab}/>);
     return (
         <div>{Tables}</div>
     );
@@ -29,7 +29,6 @@ export default class IssueList extends React.Component {
 
     componentDidMount() {
       //  this.loadData();
-
         let processChanges = (results) => {
             let arr=[];
             let cont=0;
@@ -39,7 +38,9 @@ export default class IssueList extends React.Component {
                     arr[cont++]=doc;
             }
             console.log(arr)
-            this.setState({tables: arr});
+                if(arr.length > 0)
+                    this.loadData();
+            //this.setState({tables: arr});
         };
         let client;
 
