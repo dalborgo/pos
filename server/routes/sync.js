@@ -1,5 +1,6 @@
 import Swagger from 'swagger-client';
 import config from '../../config/config.json';
+import fs from 'fs';
 import spec from '../../static/sg/sync-gateway-public-1-4_public.json';
 import {v4} from 'uuid';
 
@@ -202,8 +203,8 @@ const appRouter = function (app) {
         let body = {
             "_id": "Table::" + v4(),
             "type": "Table",
-            "name": "Table 3",
-            "display": "Tavolo Esterno 2",
+            "name": "Table 4",
+            "display": "Tavolo Interno",
             "rgb": [0, 0, 0],
             "image": "",
             "Room": "Room::143be1d0-5bf4-4b53-9836-5abe377a99dc"
@@ -217,6 +218,10 @@ const appRouter = function (app) {
     });
 
     app.get("/api/sync/table/bulk_create", function (req, res) {
+        let img = fs.readFileSync('./static/imgs/tavolo.png');
+        let tavolo = img.toString('base64');
+        let img2 = fs.readFileSync('./static/imgs/tavolo2.png');
+        let tavolo2 = img2.toString('base64');
         let body = {
             "docs": [
                 {
@@ -226,7 +231,17 @@ const appRouter = function (app) {
                     "display": "Tavolo Grande",
                     "rgb": [0, 0, 0],
                     "image": "",
-                    "Room": "Room::1d633c4c-5a24-4632-add8-eddb94ecc434"
+                    "Room": "Room::1d633c4c-5a24-4632-add8-eddb94ecc434",
+                    "_attachments" : {
+                        "tavolo_vuoto": {
+                            "content_type": 'image\/png',
+                            "data": tavolo
+                        },
+                        "tavolo_pieno": {
+                            "content_type": 'image\/png',
+                            "data": tavolo2
+                        }
+                    }
                 }, {
                     "_id": "Table::6f5e484d-8e4f-41e6-9c68-40fc728e4eb0",
                     "type": "Table",
@@ -234,7 +249,17 @@ const appRouter = function (app) {
                     "display": "Tavolo Esterno",
                     "rgb": [0, 0, 0],
                     "image": "",
-                    "Room": "Room::1d633c4c-5a24-4632-add8-eddb94ecc434"
+                    "Room": "Room::1d633c4c-5a24-4632-add8-eddb94ecc434",
+                    "_attachments" : {
+                        "tavolo_vuoto": {
+                            "content_type": 'image\/png',
+                            "data": tavolo
+                        },
+                        "tavolo_pieno": {
+                            "content_type": 'image\/png',
+                            "data": tavolo2
+                        }
+                    }
                 },
                 {
                     "_id": "Room::1983e957-11aa-4250-89c6-cfa2e0bb7aa2",

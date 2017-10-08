@@ -8,7 +8,7 @@ import spec from '../static/sg/sync-gateway-public-1-4_public.json';
 spec.host = config.couchbase.sync_server;
 
 const Table = (props) => (
-    <span>{props.tables.key}</span>
+    <div><img src={`http://${config.couchbase.sync_server_public}/risto/${props.tables.id}/tavolo_vuoto`} /><br/>{props.tables.value.name}</div>
 );
 
 function Container(props) {
