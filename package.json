@@ -41,6 +41,7 @@
     "parallelshell": "^3.0.1",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
+    "react-router-dom": "^4.2.2",
     "webpack": "^3.6.0",
     "webpack-dev-server": "^2.9.1",
     "whatwg-fetch": "^2.0.3"

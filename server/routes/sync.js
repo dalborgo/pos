@@ -231,13 +231,13 @@ const appRouter = function (app) {
                     "display": "Tavolo Grande",
                     "rgb": [0, 0, 0],
                     "image": "",
-                    "Room": "Room::1d633c4c-5a24-4632-add8-eddb94ecc434",
+                    "Room": "Room::1983e957-11aa-4250-89c6-cfa2e0bb7aa2",
                     "_attachments" : {
-                        "tavolo_vuoto": {
+                        "tavolo_vuoto_100": {
                             "content_type": 'image\/png',
                             "data": tavolo
                         },
-                        "tavolo_pieno": {
+                        "tavolo_pieno_100": {
                             "content_type": 'image\/png',
                             "data": tavolo2
                         }
@@ -249,13 +249,13 @@ const appRouter = function (app) {
                     "display": "Tavolo Esterno",
                     "rgb": [0, 0, 0],
                     "image": "",
-                    "Room": "Room::1d633c4c-5a24-4632-add8-eddb94ecc434",
+                    "Room": "Room::1983e957-11aa-4250-89c6-cfa2e0bb7aa2",
                     "_attachments" : {
-                        "tavolo_vuoto": {
+                        "tavolo_vuoto_100": {
                             "content_type": 'image\/png',
                             "data": tavolo
                         },
-                        "tavolo_pieno": {
+                        "tavolo_pieno_100": {
                             "content_type": 'image\/png',
                             "data": tavolo2
                         }

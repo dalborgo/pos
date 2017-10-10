@@ -18,8 +18,8 @@ const CouchbaseStore = require('connect-couchbase')(session);
 const couchbaseStore = new CouchbaseStore({
     bucket: config.couchbase.bucket,               //optional
     host: config.couchbase.server,          //optional
-    prefix: 'Sess|'
-    //ttl: 84400 in secondi
+    prefix: 'Sess|',
+    ttl: 60 //in secondi
 });
 
 app.use(session({
@@ -34,9 +34,9 @@ const myBucket = (new couchbase.Cluster(config.couchbase.server)).openBucket(con
 ottoman.store = new ottoman.CbStoreAdapter(myBucket, couchbase);
 module.exports.store = new ottoman.CbStoreAdapter(myBucket, couchbase);
 
-couchbaseStore.on('connect', function () {
+/*couchbaseStore.on('connect', function () {
     //console.log("Couchbase Session store is ready for use");
-});
+});*/
 
 app.use(cookieParser());
 
@@ -48,6 +48,9 @@ app.use(function (req, res, next) {
 
 const user = require("./routes/sync")(app);
 
+/*app.get('*', (req, res) => {
+    res.sendFile(path.resolve('static/index.html'));
+});*/
 ottoman.store = module.exports.store;
 
 ottoman.ensureIndices(function (error) {

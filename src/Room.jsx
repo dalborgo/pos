@@ -4,11 +4,36 @@ import {v4} from 'uuid';
 import Swagger from 'swagger-client';
 import config from '../config/config.json';
 import spec from '../static/sg/sync-gateway-public-1-4_public.json';
+const api = {
+    longpoll: function(that){
+            getChanges(0);
+            function getChanges(seq) {
+                let url = `http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}`;
+                fetch(url+`/_changes?include_docs=true&feed=longpoll&since=${seq}`, {})
+                    .then((res) => res.json())
+                    .then((res) => {
+                        let m = res.results.filter((row) => {
+                            if (row.doc && row.doc.type === 'Table') {
+                                console.log(row.doc);
+                                return true;
+                            }
+                            return false;
+                        });
+                        let res2 = m.map((row) => row.doc);
+                        console.log('Tavoli '+res2.length);
+                        if(res2.length>0)
+                            that.loadData();
+                        getChanges(res.last_seq);
+                    });
+            }
 
-spec.host = config.couchbase.sync_server;
+    }
+};
+
+//spec.host = config.couchbase.sync_server;
 
 const Table = (props) => (
-    <div><img src={`http://${config.couchbase.sync_server_public}/risto/${props.tables.id}/tavolo_vuoto`} /><br/>{props.tables.value.name}</div>
+    <div><img src={`http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}/${props.tables.id}/tavolo_vuoto_100`} /><br/>{props.tables.value.name}</div>
 );
 
 function Container(props) {
@@ -29,15 +54,20 @@ export default class IssueList extends React.Component {
 
     componentDidMount() {
       //  this.loadData();
-        let processChanges = (results) => {
+       /* let processChanges = (results) => {
             let arr=[];
             let cont=0;
             for (let i = 0; i < results.length; i++) {
                 const doc = results[i].doc;
-                if(doc.type==='Table')
-                    arr[cont++]=doc;
+                try
+                {
+                    if (doc.type === 'Table')
+                        arr[cont++] = doc;
+                }catch(err){
+
+                }
             }
-            console.log(arr)
+            //console.log(arr)
                 if(arr.length > 0)
                     this.loadData();
             //this.setState({tables: arr});
@@ -57,9 +87,9 @@ export default class IssueList extends React.Component {
                 //filter: 'sync_gateway/bychannel',
                 //channels: 'notification',
                 client.apis.database.get__db___changes({
-                    db: 'risto',
+                    db: config.couchbase.sync_db,
                     include_docs: true,
-                    active_only: true,
+                    active_only: false,
                     since: seq,
                     feed: 'longpoll',
                     timeout: 0
@@ -75,8 +105,32 @@ export default class IssueList extends React.Component {
                         console.log(err);
                     });
             }
-        });
-        //console.log('dopo')
+        });*/
+
+       /* let seq=0
+        fetch(`http://localhost:4984/risto/_changes?include_docs=true&feed=longpoll&since=${seq}`, {
+
+        })
+            .then((res) => res.json())
+            .then((res) => {
+                let m=res.results.filter((row) => {
+                    if (row.doc && row.doc.type === 'Table') {
+                        console.log(row.doc);
+                        return true;
+                    }
+                    return false;
+                })
+                let res2=m.map((row) => row.doc)
+                const results = res.results;
+                console.log(results.length + ' change(s) received');
+
+                //processChanges(results);
+                //that.loadData()
+                console.log(res.last_seq);
+                this.loadData()
+            });*/
+        api.longpoll(this);
+        console.log('dopo')
     }
 
     loadData() {
