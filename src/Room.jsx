@@ -3,6 +3,7 @@ import 'whatwg-fetch';
 import {v4} from 'uuid';
 import Swagger from 'swagger-client';
 import config from '../config/config.json';
+import GridListExampleSingleLine from './GridListExampleSingleLine.jsx';
 import spec from '../static/sg/sync-gateway-public-1-4_public.json';
 const api = {
     longpoll: function(that){
@@ -14,7 +15,7 @@ const api = {
                     .then((res) => {
                         let m = res.results.filter((row) => {
                             if (row.doc && row.doc.type === 'Table') {
-                                console.log(row.doc);
+                               // console.log(row.doc);
                                 return true;
                             }
                             return false;
@@ -52,85 +53,8 @@ export default class IssueList extends React.Component {
         //this.createIssue = this.createIssue.bind(this);
     }
 
-    componentDidMount() {
-      //  this.loadData();
-       /* let processChanges = (results) => {
-            let arr=[];
-            let cont=0;
-            for (let i = 0; i < results.length; i++) {
-                const doc = results[i].doc;
-                try
-                {
-                    if (doc.type === 'Table')
-                        arr[cont++] = doc;
-                }catch(err){
-
-                }
-            }
-            //console.log(arr)
-                if(arr.length > 0)
-                    this.loadData();
-            //this.setState({tables: arr});
-        };
-        let client;
-
-        new Swagger({
-            spec: spec,
-            usePromise: true
-        }).then(function (res) {
-            client = res;
-            // Start getting changes at seq: 0
-            getChanges(0);
-
-            function getChanges(seq) {
-                // Use the Swagger client to connect to the changes feed
-                //filter: 'sync_gateway/bychannel',
-                //channels: 'notification',
-                client.apis.database.get__db___changes({
-                    db: config.couchbase.sync_db,
-                    include_docs: true,
-                    active_only: false,
-                    since: seq,
-                    feed: 'longpoll',
-                    timeout: 0
-                })
-                    .then(function (res) {
-                        const results = res.obj.results;
-                        console.log(results.length + ' change(s) received');
-
-                        processChanges(results);
-                        getChanges(res.obj.last_seq);
-                    })
-                    .catch(function (err) {
-                        console.log(err);
-                    });
-            }
-        });*/
-
-       /* let seq=0
-        fetch(`http://localhost:4984/risto/_changes?include_docs=true&feed=longpoll&since=${seq}`, {
-
-        })
-            .then((res) => res.json())
-            .then((res) => {
-                let m=res.results.filter((row) => {
-                    if (row.doc && row.doc.type === 'Table') {
-                        console.log(row.doc);
-                        return true;
-                    }
-                    return false;
-                })
-                let res2=m.map((row) => row.doc)
-                const results = res.results;
-                console.log(results.length + ' change(s) received');
-
-                //processChanges(results);
-                //that.loadData()
-                console.log(res.last_seq);
-                this.loadData()
-            });*/
+    componentWillMount() {
         api.longpoll(this);
-        console.log('dopo')
     }
 
     loadData() {
@@ -168,13 +92,7 @@ export default class IssueList extends React.Component {
         return (
             <div>
                 <Container tables={this.state.tables}/>
-                {/*<div>
-                    <form name="issueAdd" onSubmit={this.handleSubmit}>
-                        <input type="text" name="user" placeholder="User" />
-                        <input type="text" name="password" placeholder="Password" />
-                        <button>Add</button>
-                    </form>
-                </div>*/}
+                <GridListExampleSingleLine tables={this.state.tables}/>
             </div>
 
         );

@@ -1,5 +1,5 @@
 {
-  "couchbase_": {
+  "couchbase__": {
     "server": "couchbase://10.0.2.28",
     "bucket": "afame",
     "sync_server": "10.0.2.28:4985",
@@ -13,7 +13,7 @@
     "sync_server_public": "localhost:4984",
     "sync_db": "risto"
   },
-  "couchbase_": {
+  "couchbase__": {
     "server": "couchbase://192.168.1.146",
     "bucket": "risto",
     "sync_server": "192.168.1.146:4985",

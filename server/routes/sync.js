@@ -217,6 +217,22 @@ const appRouter = function (app) {
         res.send(body)
     });
 
+    app.get("/api/sync/exit/create", function (req, res) {
+        let type = 'Exit';
+        let body = {
+            "_id": type + "::" + v4(),
+            "type": type,
+            "display": "Uscita 3",
+            "index": 3
+        };
+        client.apis.document.post({db: config.couchbase.sync_db, body: body}).then(function (userRes) {
+            console.log(userRes)
+        }).catch(function (err) {
+            console.log(err)
+        });
+        res.send(body)
+    });
+
     app.get("/api/sync/table/bulk_create", function (req, res) {
         let img = fs.readFileSync('./static/imgs/tavolo.png');
         let tavolo = img.toString('base64');
@@ -269,6 +285,44 @@ const appRouter = function (app) {
                     "rgb": [0, 0, 0],
                     "image": "",
                     "tables": ["Table::76e6e4ea-7d00-4999-a75d-aeb46ffe5702", "Table::6f5e484d-8e4f-41e6-9c68-40fc728e4eb0"]
+                }
+            ]
+        };
+        client.apis.database.post__db___bulk_docs({
+            db: config.couchbase.sync_db,
+            BulkDocsBody: body
+        }).then(function (userRes) {
+            res.json(userRes);
+        }).catch(function (err) {
+            console.log(err);
+            res.send("error");
+        });
+    });
+    app.get("/api/sync/table/bulk_create_svg", function (req, res) {
+        let img = fs.readFileSync('./static/svg/meal.svg');
+        let tavolo = img.toString('base64');
+        let img2 = fs.readFileSync('./static/svg/meal.svg');
+        let tavolo2 = img2.toString('base64');
+        let body = {
+            "docs": [
+                {
+                    "_id": "Table::"+v4(),
+                    "type": "Table",
+                    "name": "Table 7",
+                    "display": "Tavolo Rettangolare",
+                    "rgb": [0, 0, 0],
+                    "image": "",
+                    "Room": "Room::1983e957-11aa-4250-89c6-cfa2e0bb7aa2",
+                    "_attachments" : {
+                        "tavolo_vuoto_100": {
+                            "content_type": 'image\/svg+xml',
+                            "data": tavolo
+                        },
+                        "tavolo_pieno_100": {
+                            "content_type": 'image\/svg+xml',
+                            "data": tavolo2
+                        }
+                    }
                 }
             ]
         };
