@@ -3,6 +3,7 @@ import 'whatwg-fetch';
 import {v4} from 'uuid';
 import Swagger from 'swagger-client';
 import config from '../config/config.json';
+import request from 'request';
 import GridListExampleSingleLine from './GridListExampleSingleLine.jsx';
 import spec from '../static/sg/sync-gateway-public-1-4_public.json';
 const api = {
@@ -14,11 +15,8 @@ const api = {
                     .then((res) => res.json())
                     .then((res) => {
                         let m = res.results.filter((row) => {
-                            if (row.doc && row.doc.type === 'Table') {
-                               // console.log(row.doc);
-                                return true;
-                            }
-                            return false;
+                            return !!(row.doc && row.doc.type === 'Table');
+
                         });
                         let res2 = m.map((row) => row.doc);
                         console.log('Tavoli '+res2.length);
@@ -27,7 +25,30 @@ const api = {
                         getChanges(res.last_seq);
                     });
             }
+    },
+    longpoll2: function(that){
+        const sync_gateway_url = `http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}/`;
+        getChanges(0);
+        function getChanges(seq) {
+            const querystring = 'include_docs=true&feed=longpoll&since=' + seq;
+            const options = {
+                url: sync_gateway_url + '_changes?' + querystring
+            };
+            request(options, function (error, response, body) {
+                if (!error && response.statusCode === 200) {
+                    const json = JSON.parse(body);
+                    let m = json.results.filter((row) => {
+                        return !!(row.doc && row.doc.type === 'Table');
 
+                    });
+                    let res2 = m.map((row) => row.doc);
+                    console.log('Tavoli '+res2.length);
+                    if(res2.length>0)
+                        that.loadData();
+                    getChanges(json.last_seq);
+                }
+            });
+        }
     }
 };
 

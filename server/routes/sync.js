@@ -1,10 +1,10 @@
 import Swagger from 'swagger-client';
 import config from '../../config/config.json';
 import fs from 'fs';
-import spec from '../../static/sg/sync-gateway-public-1-4_public.json';
+import spec from '../../static/sg/sync-gateway-public-1-4_admin.json';
 import {v4} from 'uuid';
 
-spec.host = config.couchbase.sync_server;
+spec.host = config.couchbase.sync_server_admin;
 let client;
 new Swagger({
     spec: spec,
@@ -341,7 +341,7 @@ const appRouter = function (app) {
         let body = {
             "docs": [
                 {
-                    "id": "User::dalborgo2"
+                    "id": "Room::1983e957-11aa-4250-89c6-cfa2e0bb7aa2"
                 }
             ]
         };
@@ -351,7 +351,8 @@ const appRouter = function (app) {
             attachments: false
         }).then(function (userRes) {
             //res.set('Content-Type', 'application/json');
-            res.send(new Buffer(userRes.text).toString());
+            //const d=JSON.stringify(JSON.decode(new Uint8Array(userRes.data)),null,4)
+            res.send(new Buffer(userRes.data).toString());
         }).catch(function (err) {
             console.log(err);
             res.send("error");

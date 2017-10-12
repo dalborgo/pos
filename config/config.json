@@ -2,21 +2,21 @@
   "couchbase__": {
     "server": "couchbase://10.0.2.28",
     "bucket": "afame",
-    "sync_server": "10.0.2.28:4985",
+    "sync_server_admin": "10.0.2.28:4985",
     "sync_server_public": "10.0.2.28:4984",
     "sync_db": "afame"
   },
   "couchbase": {
     "server": "couchbase://localhost",
     "bucket": "risto",
-    "sync_server": "localhost:4985",
+    "sync_server_admin": "localhost:4985",
     "sync_server_public": "localhost:4984",
     "sync_db": "risto"
   },
-  "couchbase__": {
+  "couchbase_": {
     "server": "couchbase://192.168.1.146",
     "bucket": "risto",
-    "sync_server": "192.168.1.146:4985",
+    "sync_server_admin": "192.168.1.146:4985",
     "sync_server_public": "192.168.1.146:4984",
     "sync_db": "risto"
   },

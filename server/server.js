@@ -32,7 +32,8 @@ app.use(session({
 
 const myBucket = (new couchbase.Cluster(config.couchbase.server)).openBucket(config.couchbase.bucket);
 ottoman.store = new ottoman.CbStoreAdapter(myBucket, couchbase);
-module.exports.store = new ottoman.CbStoreAdapter(myBucket, couchbase);
+module.exports = {store:ottoman.store, bucket:myBucket};
+//module.exports.bucket = myBucket;
 
 /*couchbaseStore.on('connect', function () {
     //console.log("Couchbase Session store is ready for use");
@@ -47,11 +48,12 @@ app.use(function (req, res, next) {
 });
 
 const user = require("./routes/sync")(app);
+const standard = require("./routes/standard")(app);
 
 /*app.get('*', (req, res) => {
     res.sendFile(path.resolve('static/index.html'));
 });*/
-ottoman.store = module.exports.store;
+//ottoman.store = module.exports.store;
 
 ottoman.ensureIndices(function (error) {
     if (error) {

@@ -4,9 +4,33 @@
     <head>
         <meta charset="UTF-8"/>
         <title>Punto Cassa</title>
-        <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+        <!--<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">-->
         <style>
-            body{
+            @font-face {
+                font-family: 'Roboto';
+                font-style: normal;
+                font-weight: 300;
+                src: local('Roboto Light'), local('Roboto-Light'), url(./fonts/Roboto-Light.woff2) format('woff2');
+                src: local('Roboto Light'), local('Roboto-Light'), url(./fonts/Roboto-Light.woff) format('woff');
+                unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+            }
+            @font-face {
+                font-family: 'Roboto';
+                font-style: normal;
+                font-weight: 400;
+                src: local('Roboto'), local('Roboto-Regular'), url(./fonts/Roboto.woff2) format('woff2');
+                src: local('Roboto'), local('Roboto-Regular'), url(./fonts/Roboto.woff) format('woff');
+                unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+            }
+            @font-face {
+                font-family: 'Roboto';
+                font-style: normal;
+                font-weight: 500;
+                src: local('Roboto Medium'), local('Roboto-Medium'), url(./fonts/Roboto-Medium.woff2) format('woff2');
+                src: local('Roboto Medium'), local('Roboto-Medium'), url(./fonts/Roboto-Medium.woff) format('woff');
+                unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+            }
+            body {
                 font-family: 'Roboto', sans-serif;
             }
         </style>

@@ -16,7 +16,7 @@ const styles = {
     gridList: {
         display: 'flex',
         flexWrap: 'nowrap',
-        width: '100%'
+        //width: '100%'
         //overflowX: 'auto'
     },
     titleStyle: {
@@ -25,6 +25,7 @@ const styles = {
     },
     gridTile : {
         border: 'solid 1px lightgray',
+        borderRadius: '20px',
         width: '200px',
         height: '200px'
     }

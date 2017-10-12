@@ -4,7 +4,7 @@ import config from '../../config/config.json';
 import spec from '../../static/sg/sync-gateway-public-1-3_public.json';
 import {v4} from 'uuid';
 
-spec.host = config.couchbase.sync_server;
+spec.host = config.couchbase.sync_server_admin;
 let client;
 new Swagger({
     spec: spec,
