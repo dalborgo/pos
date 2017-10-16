@@ -23,7 +23,7 @@ export api = {
             .then((res) => res.json())
             .then((res) => {
                 return res.results.filter((row) => {
-                    if (row.doc && row.doc.type == 'profile') {
+                    if (row.doc && row.doc.type === 'profile') {
                         return true;
                     }
                     return false;

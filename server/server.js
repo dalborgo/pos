@@ -14,12 +14,12 @@ const app = express();
 app.use(express.static('static'));
 app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({extended: true}));
-const CouchbaseStore = require('connect-couchbase')(session);
+/*const CouchbaseStore = require('connect-couchbase')(session);
 const couchbaseStore = new CouchbaseStore({
     bucket: config.couchbase.bucket,               //optional
     host: config.couchbase.server,          //optional
     prefix: 'Sess|',
-    ttl: 60 //in secondi
+    ttl: 86400 //in secondi 86400
 });
 
 app.use(session({
@@ -28,7 +28,7 @@ app.use(session({
     cookie: {maxAge: 24 * 60 * 60 * 1000},
     resave: true,
     saveUninitialized: true //stay open for 1 day of inactivity
-}));
+}));*/
 
 const myBucket = (new couchbase.Cluster(config.couchbase.server)).openBucket(config.couchbase.bucket);
 ottoman.store = new ottoman.CbStoreAdapter(myBucket, couchbase);
@@ -48,7 +48,7 @@ app.use(function (req, res, next) {
 });
 
 const user = require("./routes/sync")(app);
-const standard = require("./routes/standard")(app);
+//const standard = require("./routes/standard")(app);
 
 /*app.get('*', (req, res) => {
     res.sendFile(path.resolve('static/index.html'));

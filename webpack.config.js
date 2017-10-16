@@ -3,10 +3,10 @@ const path = require("path");
 module.exports = {
     entry: {
         app: './src/App.jsx',
-        vendor: ['react', 'react-dom', 'whatwg-fetch', 'babel-polyfill'],
+        vendor: ['react', 'react-dom', 'whatwg-fetch', 'babel-polyfill', 'react-router-dom', 'react-bootstrap', 'react-router-bootstrap'],
     },
     output: {
-        path: path.join(__dirname, 'static'),
+        path: path.resolve('static'),
         filename: 'app.bundle.js'
     },
     plugins: [
@@ -30,7 +30,8 @@ module.exports = {
             '/api/*': {
                 target: 'http://localhost:3000'
             }
-        }
+        },
+    historyApiFallback: true,
     },
     node: {
         fs: 'empty',

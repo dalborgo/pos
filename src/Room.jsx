@@ -75,7 +75,7 @@ export default class IssueList extends React.Component {
     }
 
     componentWillMount() {
-        api.longpoll(this);
+        api.longpoll2(this);
     }
 
     loadData() {
