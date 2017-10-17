@@ -1,34 +1,37 @@
 import React from 'react';
-import 'whatwg-fetch';
+//import 'whatwg-fetch';
 import {v4} from 'uuid';
 import Swagger from 'swagger-client';
 import config from '../config/config.json';
 import request from 'request';
 import GridListExampleSingleLine from './GridListExampleSingleLine.jsx';
 import spec from '../static/sg/sync-gateway-public-1-4_public.json';
-const api = {
-    longpoll: function(that){
-            getChanges(0);
-            function getChanges(seq) {
-                let url = `http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}`;
-                fetch(url+`/_changes?include_docs=true&feed=longpoll&since=${seq}`, {})
-                    .then((res) => res.json())
-                    .then((res) => {
-                        let m = res.results.filter((row) => {
-                            return !!(row.doc && row.doc.type === 'Table');
 
-                        });
-                        let res2 = m.map((row) => row.doc);
-                        console.log('Tavoli '+res2.length);
-                        if(res2.length>0)
-                            that.loadData();
-                        getChanges(res.last_seq);
+const api = {
+    longpoll: function (that) {
+        getChanges(0);
+
+        function getChanges(seq) {
+            let url = `http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}`;
+            fetch(url + `/_changes?include_docs=true&feed=longpoll&since=${seq}`, {})
+                .then((res) => res.json())
+                .then((res) => {
+                    let m = res.results.filter((row) => {
+                        return !!(row.doc && row.doc.type === 'Table');
+
                     });
-            }
+                    let res2 = m.map((row) => row.doc);
+                    console.log('Tavoli ' + res2.length);
+                    if (res2.length > 0)
+                        that.loadData();
+                    getChanges(res.last_seq);
+                });
+        }
     },
-    longpoll2: function(that){
+    longpoll2: function (that) {
         const sync_gateway_url = `http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}/`;
         getChanges(0);
+
         function getChanges(seq) {
             const querystring = 'include_docs=true&feed=longpoll&since=' + seq;
             const options = {
@@ -42,8 +45,8 @@ const api = {
 
                     });
                     let res2 = m.map((row) => row.doc);
-                    console.log('Tavoli '+res2.length);
-                    if(res2.length>0)
+                    console.log('Tavoli ' + res2.length);
+                    if (res2.length > 0)
                         that.loadData();
                     getChanges(json.last_seq);
                 }
@@ -55,7 +58,9 @@ const api = {
 //spec.host = config.couchbase.sync_server;
 
 const Table = (props) => (
-    <div><img src={`http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}/${props.tables.id}/tavolo_vuoto_100`} /><br/>{props.tables.value.name}</div>
+    <div><img
+        src={`http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}/${props.tables.id}/tavolo_vuoto_100`}/><br/>{props.tables.value.name}
+    </div>
 );
 
 function Container(props) {
@@ -74,7 +79,7 @@ export default class IssueList extends React.Component {
         //this.createIssue = this.createIssue.bind(this);
     }
 
-    componentWillMount() {
+    componentDidMount() {
         api.longpoll2(this);
     }
 
@@ -97,6 +102,8 @@ export default class IssueList extends React.Component {
             alert("Error in sending data to server: " + err.message);
         });
     }
+
+
 
     handleSubmit(e) {
         e.preventDefault();

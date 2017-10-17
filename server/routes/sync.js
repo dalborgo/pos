@@ -373,15 +373,17 @@ const appRouter = function (app) {
         });
     });
 
-    app.get("/api/sync/user/create", function (req, res) {
+    app.post("/api/sync/user/create", function (req, res) {
         let type = "User";
+        const user = req.body.user;
+        const password = req.body.password;
         let body = {
-            "_id": type + "::dalborgo",
+            "_id": type + "::"+user,
             "type": type,
             "name": "Marco",
             "surname": "Dal Borgo",
             "user": "dalborgo",
-            "password": "12345",
+            "password":password,
             "big_image": "",
             "small_image": "",
             "role": "administrator"

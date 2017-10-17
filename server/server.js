@@ -26,7 +26,7 @@ app.use(session({
     store: couchbaseStore,
     secret: config.salt,
     cookie: {maxAge: 24 * 60 * 60 * 1000},
-    resave: true,
+    resave: false,
     saveUninitialized: true //stay open for 1 day of inactivity
 }));*/
 
