@@ -149,13 +149,16 @@ const appRouter = function (app) {
             view: "all",
             stale: "false"
         }).then(function (userRes) {
-            console.log(userRes)
+            console.log(userRes);
             res.send(userRes);
         }).catch(function (err) {
             console.log(err);
         });
         //res.end()
     });
+
+
+
 
     app.get('/api/sync/product/create', function (req, res) {
         let type = 'Product';
@@ -199,15 +202,31 @@ const appRouter = function (app) {
         res.send(body)
     });
 
-    app.get("/api/sync/table/create", function (req, res) {
+    app.post("/api/sync/table/create", function (req, res) {
+        let img = fs.readFileSync('./static/imgs/tavolo.png');
+        let tavolo = img.toString('base64');
+        let img2 = fs.readFileSync('./static/imgs/tavolo2.png');
+        let tavolo2 = img2.toString('base64');
+        const name = req.body.owner;
+        const display = req.body.title;
         let body = {
             "_id": "Table::" + v4(),
             "type": "Table",
-            "name": "Table 4",
-            "display": "Tavolo Interno",
+            "name": name,
+            "display": display,
             "rgb": [0, 0, 0],
             "image": "",
-            "Room": "Room::143be1d0-5bf4-4b53-9836-5abe377a99dc"
+            "Room": "Room::143be1d0-5bf4-4b53-9836-5abe377a99dc",
+            "_attachments" : {
+                "tavolo_vuoto_100": {
+                    "content_type": 'image\/png',
+                    "data": tavolo
+                },
+                "tavolo_pieno_100": {
+                    "content_type": 'image\/png',
+                    "data": tavolo2
+                }
+            }
         };
         client.apis.document.post({db: config.couchbase.sync_db, body: body}).then(function (userRes) {
             console.log(userRes)
@@ -371,6 +390,33 @@ const appRouter = function (app) {
             console.log(err);
             res.send("error");
         });
+    });
+    app.get("/api/sync/get/table/:id", function (req, res) {
+        client.apis.document.get__db___doc_({
+            db: config.couchbase.sync_db,
+            doc: req.params.id
+        }).then(function (userRes) {
+            //console.log(userRes.data)
+            res.json(userRes);
+        }).catch(function (err) {
+            console.log(err);
+            res.send("error");
+        });
+    });
+
+    app.post('/api/sync/delete/table', function (req, res) {
+        let tavolo=req.body;
+        client.apis.document.delete__db___doc_({
+            db: config.couchbase.sync_db,
+            rev: tavolo.rev,
+            doc: tavolo.id
+        }).then(function (userRes) {
+            console.log(userRes);
+            res.send(userRes);
+        }).catch(function (err) {
+            console.log(err);
+        });
+        //res.end()
     });
 
     app.post("/api/sync/user/create", function (req, res) {

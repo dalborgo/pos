@@ -23,7 +23,7 @@ const styles = {
         color: 'white',
 
     },
-    gridTile : {
+    gridTile: {
         border: 'solid 1px lightgray',
         borderRadius: '20px',
         width: '200px',
@@ -32,27 +32,67 @@ const styles = {
 };
 
 
-function GridListExampleSingleLine (props) {
+function GridListExampleSingleLine(props) {
+    function carica(id) {
+        fetch('/api/sync/get/table/' + id, {
+            method: 'GET',
+            headers: {'Content-Type': 'application/json'}
+        }).then(response => {
+            if (response.ok) {
+                response.json().then(tavolo => {
+                    fetch('/api/sync/delete/table', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body:  JSON.stringify({
+                            id: tavolo.body._id,
+                            rev: tavolo.body._rev
+                        })
+                    }).then(response => {
+                        if (response.ok) {
+                            response.json().then(updatedIssue => {
+                                //alert(id)
+                            });
+                        } else {
+                            response.json().then(error => {
+                                this.showError(`Failed to add issue: ${error.message}`);
+                            });
+                        }
+                    }).catch(err => {
+                        this.showError(`Error in sending data to server: ${err.message}`);
+                    });
+                });
+            } else {
+                response.json().then(error => {
+                    this.showError(`Failed to add issue: ${error.message}`);
+                });
+            }
+        }).catch(err => {
+            this.showError(`Error in sending data to server: ${err.message}`);
+        });
+    }
+
     let tilesData = props.tables;
-    return(
-    <div style={styles.root}>
-        <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-            <GridList style={styles.gridList} cellHeight={'auto'}>
-                {tilesData.map((tile) => (
-                    <GridTile
-                        key={tile.id}
-                        title={tile.value.name}
-                        actionIcon={<IconButton><StarBorder color="white"/></IconButton>}
-                        titleStyle={styles.titleStyle}
-                        titleBackground="linear-gradient(to top, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
-                        style={styles.gridTile}
-                    >
-                        <img src={`http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}/${tile.id}/tavolo_vuoto_100`} />
-                    </GridTile>
-                ))}
-            </GridList>
-        </MuiThemeProvider>
-    </div>
+    return (
+        <div style={styles.root}>
+            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+                <GridList style={styles.gridList} cellHeight={'auto'}>
+                    {tilesData.map((tile) => (
+                        <GridTile
+                            key={tile.id}
+                            title={tile.value.name}
+                            actionIcon={<IconButton onClick={() => carica(tile.id)}><StarBorder
+                                color="white"/></IconButton>}
+                            titleStyle={styles.titleStyle}
+                            titleBackground="linear-gradient(to top, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
+                            style={styles.gridTile}
+                        >
+                            <img
+                                src={`http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}/${tile.id}/tavolo_vuoto_100`}/>
+                        </GridTile>
+                    ))}
+                </GridList>
+            </MuiThemeProvider>
+        </div>
     )
 }
 

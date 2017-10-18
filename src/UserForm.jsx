@@ -95,7 +95,7 @@ export default class UserForm extends React.Component {
 
     render() {
         return (
-            <Form inline name="issueAdd" onSubmit={this.handleSubmit}>
+            <Form inline name="issueAdd2" onSubmit={this.handleSubmit}>
                 <ControlLabel>User</ControlLabel>
                 <FormControl name="user" placeholder="User" value={this.state.user} onChange={this.userInputChange}/>
                 <ControlLabel>Password</ControlLabel>
