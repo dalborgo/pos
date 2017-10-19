@@ -13,16 +13,12 @@ const api = {
 
         function getChanges(seq) {
             let url = `http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}`;
-            fetch(url + `/_changes?include_docs=true&feed=longpoll&since=${seq}`, {})
+            fetch(url + `/_changes?include_docs=true&feed=longpoll&filter=sync_gateway/bychannel&channels=tables&since=${seq}`, {})
                 .then((res) => res.json())
                 .then((res) => {
-                    let m = res.results.filter((row) => {
-                        return !!(row.doc && row.doc.type === 'Table');
-
-                    });
-                    let res2 = m.map((row) => row.doc);
-                    console.log('Tavoli ' + res2.length);
-                    if (res2.length > 0)
+                    let m = res.results;
+                    console.log('Tavoli ' + m.length);
+                    if (m.length > 0)
                         that.loadData();
                     getChanges(res.last_seq);
                 });
@@ -33,20 +29,18 @@ const api = {
         getChanges(0);
 
         function getChanges(seq) {
-            const querystring = 'include_docs=true&feed=longpoll&since=' + seq;
+            console.log('seq %s', seq)
+            const querystring = 'feed=longpoll&filter=sync_gateway/bychannel&channels=tables&timeout=0&since=' + seq;
             const options = {
                 url: sync_gateway_url + '_changes?' + querystring
             };
             request(options, function (error, response, body) {
                 if (!error && response.statusCode === 200) {
                     const json = JSON.parse(body);
-                    let m = json.results.filter((row) => {
-                        return !!(row.doc && row.doc.type === 'Table');
-
-                    });
-                    let res2 = m.map((row) => row.doc);
-                    console.log('Tavoli ' + res2.length);
-                    if (res2.length > 0)
+                    let m = json.results;
+                    //let res2 = m.map((row) => row);
+                    console.log('Tavoli ' + m.length);
+                    if (m.length > 0)
                         that.loadData();
                     getChanges(json.last_seq);
                 }
@@ -79,8 +73,8 @@ export default class IssueList extends React.Component {
         //this.createIssue = this.createIssue.bind(this);
     }
 
-    componentDidMount() {
-        api.longpoll2(this);
+    componentWillMount() {
+        api.longpoll(this);
     }
 
     loadData() {

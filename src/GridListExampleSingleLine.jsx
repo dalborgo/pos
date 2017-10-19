@@ -5,7 +5,12 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import IconButton from 'material-ui/IconButton';
 import StarBorder from 'material-ui/svg-icons/toggle/star-border';
+//import Swagger from 'swagger-client';
 import config from '../config/config.json';
+/*import spec from '../static/sg/sync-gateway-public-1-4_admin.json';
+spec.host = config.couchbase.sync_server_admin;*/
+import api from './api'
+import 'whatwg-fetch';
 
 const styles = {
     root: {
@@ -34,41 +39,17 @@ const styles = {
 
 function GridListExampleSingleLine(props) {
     function carica(id) {
-        fetch('/api/sync/get/table/' + id, {
-            method: 'GET',
-            headers: {'Content-Type': 'application/json'}
-        }).then(response => {
-            if (response.ok) {
-                response.json().then(tavolo => {
-                    fetch('/api/sync/delete/table', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body:  JSON.stringify({
-                            id: tavolo.body._id,
-                            rev: tavolo.body._rev
-                        })
-                    }).then(response => {
-                        if (response.ok) {
-                            response.json().then(updatedIssue => {
-                                //alert(id)
-                            });
-                        } else {
-                            response.json().then(error => {
-                                this.showError(`Failed to add issue: ${error.message}`);
-                            });
-                        }
-                    }).catch(err => {
-                        this.showError(`Error in sending data to server: ${err.message}`);
-                    });
-                });
-            } else {
-                response.json().then(error => {
-                    this.showError(`Failed to add issue: ${error.message}`);
-                });
-            }
-        }).catch(err => {
-            this.showError(`Error in sending data to server: ${err.message}`);
-        });
+        const a = new api()
+        a.getTable(id).then(
+            (res)=> a.deleteTable(res))
+       /* let url = `http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}`;
+        fetch(url + '/' + id, {})
+            .then((res) => res.json())
+            .then((res) => {
+                let {_rev} = res;
+                console.log(_rev);
+
+            });*/
     }
 
     let tilesData = props.tables;
