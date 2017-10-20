@@ -21,7 +21,7 @@ const Header = () => (
         </Navbar.Header>
         <Nav>
             <LinkContainer to="/room">
-                <NavItem>Issues</NavItem>
+                <NavItem>Rooms</NavItem>
             </LinkContainer>
             <LinkContainer to="/vuoto">
                 <NavItem>Reports</NavItem>

@@ -216,7 +216,7 @@ const appRouter = function (app) {
             "display": display,
             "rgb": [0, 0, 0],
             "image": "",
-            "Room": "Room::143be1d0-5bf4-4b53-9836-5abe377a99dc",
+            "Room": "Room::1983e957-11aa-4250-89c6-cfa2e0bb7aa2",
             "_attachments" : {
                 "tavolo_vuoto_100": {
                     "content_type": 'image\/png',

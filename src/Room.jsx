@@ -30,7 +30,7 @@ const api = {
 
         function getChanges(seq) {
             console.log('seq %s', seq)
-            const querystring = 'feed=longpoll&filter=sync_gateway/bychannel&channels=tables&timeout=0&since=' + seq;
+            const querystring = 'feed=longpoll&filter=sync_gateway/bychannel&channels=Tables&timeout=0&since=' + seq;
             const options = {
                 url: sync_gateway_url + '_changes?' + querystring
             };

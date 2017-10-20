@@ -70,10 +70,10 @@ class IssueAddNavItem extends React.Component {
 
     render() {
         return (
-            <NavItem onClick={this.showModal}><Glyphicon glyph="plus"/> Create Issue
+            <NavItem onClick={this.showModal}><Glyphicon glyph="plus"/> Create Table
                 <Modal keyboard show={this.state.showing} onHide={this.hideModal}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Create Issue</Modal.Title>
+                        <Modal.Title>Create Table</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <Form name="issueAdd">
