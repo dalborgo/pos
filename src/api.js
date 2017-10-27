@@ -1,9 +1,14 @@
 //import 'whatwg-fetch';
 import config from '../config/config.json';
+//import fs from 'fs';
+const path = require("path");
+import {v4} from 'uuid';
+
 export default class api {
-    constructor(){
+    constructor() {
         this.url = `http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}`
     }
+
     getTable(id) {
         return fetch(this.url + '/' + id, {
             headers: {
@@ -11,9 +16,29 @@ export default class api {
             }
         }).then((res) => res.json());
     }
+
     deleteTable(doc) {
-        return fetch(this.url + '/' + doc._id + '/?rev=' + doc._rev, {
+        return fetch(this.url + '/' + doc._id + '?rev=' + doc._rev, {
             method: 'delete',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then((res) => res.json());
+    }
+
+    createTable(doc) {
+        return fetch('/api/sync/table/create', {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(doc),
+        }).then((res) => res.json());
+    }
+
+    getView(ddoc, view,stale) {
+        return fetch(this.url + '/_design/' + ddoc + '/_view/' + view + '?include_docs=true&stale='+stale, {
+            method: 'get',
             headers: {
                 'Content-Type': 'application/json'
             }

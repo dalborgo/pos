@@ -10,6 +10,7 @@ import config from '../config/config.json';
 /*import spec from '../static/sg/sync-gateway-public-1-4_admin.json';
 spec.host = config.couchbase.sync_server_admin;*/
 import api from './api'
+const a = new api();
 import 'whatwg-fetch';
 
 const styles = {
@@ -39,7 +40,7 @@ const styles = {
 
 function GridListExampleSingleLine(props) {
     function carica(id) {
-        const a = new api()
+
         a.getTable(id).then(
             (res)=> a.deleteTable(res))
        /* let url = `http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}`;

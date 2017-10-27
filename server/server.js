@@ -48,7 +48,7 @@ app.use(function (req, res, next) {
 });
 
 const user = require("./routes/sync")(app);
-//const standard = require("./routes/standard")(app);
+const standard = require("./routes/standard")(app);
 
 /*app.get('*', (req, res) => {
     res.sendFile(path.resolve('static/index.html'));

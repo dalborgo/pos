@@ -10,17 +10,25 @@ const appRouter = function (app) {
                 res.end();
             } else {
                 const rants = [];
-
                 for (let i in results) {
                     const result = results[i];
                     if (result.value)
                         rants.push(result.value);
                 }
-
                 res.json(rants); // write the rants array to the response
             }
 
         });
+    });
+    app.post("/api/table/set/var", function (req, res) {
+       bucket.counter(req.body.variable,req.body.delta,{initial: 0},function (err, r) {
+            res.json(r)
+       })
+    });
+    app.post("/api/table/get/var", function (req, res) {
+        bucket.get(req.body.variable,function (err, r) {
+            res.json(r)
+        })
     });
 };
 

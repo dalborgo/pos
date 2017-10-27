@@ -3,8 +3,11 @@ import config from '../../config/config.json';
 import fs from 'fs';
 import spec from '../../static/sg/sync-gateway-public-1-4_admin.json';
 import {v4} from 'uuid';
-
 spec.host = config.couchbase.sync_server_admin;
+function getBase64(path){
+    let img = fs.readFileSync(path);
+    return img.toString('base64');
+}
 let client;
 new Swagger({
     spec: spec,
@@ -201,14 +204,15 @@ const appRouter = function (app) {
         });
         res.send(body)
     });
-
+    app.get("/api/table/img", function (req, res) {
+        let tavolo=getBase64('./static/imgs/tavolo.png');
+        res.send(tavolo);
+    });
     app.post("/api/sync/table/create", function (req, res) {
-        let img = fs.readFileSync('./static/imgs/tavolo.png');
-        let tavolo = img.toString('base64');
-        let img2 = fs.readFileSync('./static/imgs/tavolo2.png');
-        let tavolo2 = img2.toString('base64');
-        const name = req.body.owner;
-        const display = req.body.title;
+        let tavolo=getBase64('./static/svg/meal.svg');
+        //let tavolo2=getBase64('./static/imgs/tavolo.png');
+        const name = req.body.name;
+        const display = req.body.display;
         let body = {
             "_id": "Table::" + v4(),
             "type": "Table",
@@ -219,12 +223,12 @@ const appRouter = function (app) {
             "Room": "Room::1983e957-11aa-4250-89c6-cfa2e0bb7aa2",
             "_attachments" : {
                 "tavolo_vuoto_100": {
-                    "content_type": 'image\/png',
+                    "content_type": 'image\/svg+xml',
                     "data": tavolo
                 },
                 "tavolo_pieno_100": {
-                    "content_type": 'image\/png',
-                    "data": tavolo2
+                    "content_type": 'image\/svg+xml',
+                    "data": tavolo
                 }
             }
         };

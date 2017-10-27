@@ -7,7 +7,9 @@ import {
 } from 'react-bootstrap';
 
 import Toast from './Toast.jsx';
+import api from './api'
 
+const a = new api();
 class IssueAddNavItem extends React.Component {
     constructor(props) {
         super(props);
@@ -45,27 +47,15 @@ class IssueAddNavItem extends React.Component {
         e.preventDefault();
         this.hideModal();
         const form = document.forms.issueAdd;
-        const newIssue = {
-            owner: form.owner.value,
-            title: form.owner.title
+        const doc = {
+            name: form.title.value,
+            display: form.owner.value
         };
-        fetch('/api/sync/table/create', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(newIssue),
-        }).then(response => {
-            if (response.ok) {
-                response.json().then(updatedIssue => {
-                    this.props.history.push('/room');
-                });
-            } else {
-                response.json().then(error => {
-                    this.showError(`Failed to add issue: ${error.message}`);
-                });
-            }
-        }).catch(err => {
-            this.showError(`Error in sending data to server: ${err.message}`);
-        });
+        const path=this.props.location.pathname
+        a.createTable(doc).then( (res)=>{
+            if(path!=='/room')
+                this.props.history.push('/room')
+        })
     }
 
     render() {

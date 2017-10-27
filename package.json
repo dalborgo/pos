@@ -16,6 +16,7 @@
   "author": "Marco Dal Borgo",
   "license": "ISC",
   "dependencies": {
+    "base64-img": "^1.0.3",
     "body-parser": "^1.18.2",
     "connect-couchbase": "^0.2.10",
     "cookie-parser": "^1.4.3",

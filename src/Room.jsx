@@ -6,23 +6,36 @@ import config from '../config/config.json';
 import request from 'request';
 import GridListExampleSingleLine from './GridListExampleSingleLine.jsx';
 import spec from '../static/sg/sync-gateway-public-1-4_public.json';
+import api from './api'
 
-const api = {
+const a = new api();
+const poll = {
     longpoll: function (that) {
-        getChanges(0);
-
         function getChanges(seq) {
+            console.log('seq %s', seq)
             let url = `http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}`;
             fetch(url + `/_changes?include_docs=true&feed=longpoll&filter=sync_gateway/bychannel&channels=tables&since=${seq}`, {})
                 .then((res) => res.json())
                 .then((res) => {
                     let m = res.results;
                     console.log('Tavoli ' + m.length);
-                    if (m.length > 0)
-                        that.loadData();
+                    if (m.length > 0) {
+                        console.log('CARICA2')
+                        that.loadData(false);
+                    }
                     getChanges(res.last_seq);
                 });
         }
+
+        fetch('/api/table/get/var', {
+            method: 'post',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({variable:'_sync:seq'}),
+        }).then((res) => res.json()).then(res=>
+            {
+                getChanges(res.value);
+            }
+        );
     },
     longpoll2: function (that) {
         const sync_gateway_url = `http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}/`;
@@ -70,34 +83,22 @@ export default class IssueList extends React.Component {
         super();
         this.state = {tables: []};
         this.handleSubmit = this.handleSubmit.bind(this);
-        //this.createIssue = this.createIssue.bind(this);
     }
 
     componentWillMount() {
-        api.longpoll(this);
+        console.log('CARICA')
+        poll.longpoll(this);
+        this.loadData('');
     }
 
-    loadData() {
-        fetch('/api/sync/get/tables', {
-            method: 'GET',
-            headers: {'Content-Type': 'application/json'}
-        }).then(response => {
-            if (response.ok) {
-                response.json().then(val => {
-                    console.log(val.obj.rows);
-                    this.setState({tables: val.obj.rows});
-                });
-            } else {
-                response.json().then(error => {
-                    alert("Failed to add issue: " + error.message)
-                });
-            }
-        }).catch(err => {
-            alert("Error in sending data to server: " + err.message);
-        });
+    loadData(stale) {
+       a.getView('tables','all',stale).then(
+           (res)=>{
+               console.log(res);
+               this.setState({tables: res.rows});
+           }
+       )
     }
-
-
 
     handleSubmit(e) {
         e.preventDefault();
