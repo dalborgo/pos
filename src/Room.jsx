@@ -6,6 +6,7 @@ import config from '../config/config.json';
 import request from 'request';
 import GridListExampleSingleLine from './GridListExampleSingleLine.jsx';
 import spec from '../static/sg/sync-gateway-public-1-4_public.json';
+import {Nav, NavItem} from 'react-bootstrap';
 import api from './api'
 
 const a = new api();
@@ -14,7 +15,7 @@ const poll = {
         function getChanges(seq) {
             console.log('seq %s', seq)
             let url = `http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}`;
-            fetch(url + `/_changes?include_docs=true&feed=longpoll&filter=sync_gateway/bychannel&channels=tables&since=${seq}`, {})
+            fetch(url + `/_changes?include_docs=true&feed=longpoll&filter=sync_gateway/bychannel&channels=tables,rooms&limit=1&since=${seq}`, {})
                 .then((res) => res.json())
                 .then((res) => {
                     let m = res.results;
@@ -22,20 +23,14 @@ const poll = {
                     if (m.length > 0) {
                         console.log('CARICA2')
                         that.loadData(false);
+                        getChanges(res.last_seq);
                     }
-                    getChanges(res.last_seq);
                 });
         }
 
-        fetch('/api/table/get/var', {
-            method: 'post',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({variable:'_sync:seq'}),
-        }).then((res) => res.json()).then(res=>
-            {
-                getChanges(res.value);
-            }
-        );
+        a.get_var('_sync:seq').then(res => {
+            getChanges(res.value)
+        });
     },
     longpoll2: function (that) {
         const sync_gateway_url = `http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}/`;
@@ -43,7 +38,7 @@ const poll = {
 
         function getChanges(seq) {
             console.log('seq %s', seq)
-            const querystring = 'feed=longpoll&filter=sync_gateway/bychannel&channels=Tables&timeout=0&since=' + seq;
+            const querystring = 'feed=normal&filter=sync_gateway/bychannel&channels=Tables&timeout=0&since=' + seq;
             const options = {
                 url: sync_gateway_url + '_changes?' + querystring
             };
@@ -77,27 +72,70 @@ function Container(props) {
     );
 }
 
+function Rooms(props) {
+    let r = props.righe.map(tab => <NavItem eventKey={tab.id} key={tab.id}>{tab.key}</NavItem>);
+    return (
+        <Nav bsStyle="pills" activeKey={props.activeKey} onSelect={props.onSelect}>
+            {r}
+        </Nav>
+    );
+}
 
 export default class IssueList extends React.Component {
     constructor() {
         super();
-        this.state = {tables: []};
+        //let ro = ['Room::1983e957-11aa-4250-89c6-cfa2e0bb7aa2', 'Room::1983e000-11aa-4250-89c6-cfa2e0bb7aa2']
+        this.state = {
+            tables: [],
+            rooms: [],
+            room: 'Room::1983e957-11aa-4250-89c6-cfa2e0bb7aa2'
+        };
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleSelect = this.handleSelect.bind(this);
     }
 
     componentWillMount() {
-        console.log('CARICA')
+        console.log('CARICA');
         poll.longpoll(this);
         this.loadData('');
     }
 
     loadData(stale) {
-       a.getView('tables','all',stale).then(
-           (res)=>{
-               console.log(res);
-               this.setState({tables: res.rows});
-           }
-       )
+        a.getView('rooms', 'all', stale).then(
+            (res) => {
+                let stanze = res.rows;
+                this.setState({rooms: stanze});
+            }
+        );
+        a.getView('tables', 'all', stale).then(
+            (res) => {
+                let s = res.rows.filter(t => t.value.Room === this.state.room)
+                this.setState({tables: s});
+            }
+        )
+    }
+
+    loadData2(stale) {
+        let url = '/api/sync/get/tables';
+        fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({stale: stale})
+        }).then(response => {
+            if (response.ok) {
+                response.json().then(val => {
+                    //console.log(val.obj.rows);
+                    let s = val.obj.rows.filter(t => t.value.Room === this.state.room)
+                    this.setState({tables: s});
+                });
+            } else {
+                response.json().then(error => {
+                    alert("Failed to add issue: " + error.message)
+                });
+            }
+        }).catch(err => {
+            alert("Error in sending data to server: " + err.message);
+        });
     }
 
     handleSubmit(e) {
@@ -111,10 +149,20 @@ export default class IssueList extends React.Component {
         form.password.value = "";
     }
 
+    handleSelect(selectedKey) {
+        let st = Object.assign({}, this.state);
+        st.room = selectedKey;
+        this.setState(st);
+        this.loadData('');
+    }
+
     render() {
         return (
             <div>
-                <Container tables={this.state.tables}/>
+                <Rooms righe={this.state.rooms} activeKey={this.state.room} onSelect={this.handleSelect}/>
+                <br/>
+                <br/>
+                {/*<Container tables={this.state.tables}/>*/}
                 <GridListExampleSingleLine tables={this.state.tables}/>
             </div>
 

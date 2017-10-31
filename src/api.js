@@ -35,7 +35,13 @@ export default class api {
             body: JSON.stringify(doc),
         }).then((res) => res.json());
     }
-
+    get_var(v){
+        return fetch('/api/table/get/var', {
+            method: 'post',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({variable:v}),
+        }).then((res) => res.json());
+    }
     getView(ddoc, view,stale) {
         return fetch(this.url + '/_design/' + ddoc + '/_view/' + view + '?include_docs=true&stale='+stale, {
             method: 'get',

@@ -145,12 +145,12 @@ const appRouter = function (app) {
         res.send(body)
     });
 
-    app.get('/api/sync/get/tables', function (req, res) {
+    app.post('/api/sync/get/tables', function (req, res) {
         client.apis.query.get__db___design__ddoc___view__view_({
             db: config.couchbase.sync_db,
             ddoc: "tables",
             view: "all",
-            stale: "false"
+            stale: req.body.stale.toString()
         }).then(function (userRes) {
             console.log(userRes);
             res.send(userRes);
@@ -159,9 +159,6 @@ const appRouter = function (app) {
         });
         //res.end()
     });
-
-
-
 
     app.get('/api/sync/product/create', function (req, res) {
         let type = 'Product';
@@ -209,7 +206,7 @@ const appRouter = function (app) {
         res.send(tavolo);
     });
     app.post("/api/sync/table/create", function (req, res) {
-        let tavolo=getBase64('./static/svg/meal.svg');
+        let tavolo=getBase64('./static/svg/meal2.svg');
         //let tavolo2=getBase64('./static/imgs/tavolo.png');
         const name = req.body.name;
         const display = req.body.display;
@@ -220,7 +217,7 @@ const appRouter = function (app) {
             "display": display,
             "rgb": [0, 0, 0],
             "image": "",
-            "Room": "Room::1983e957-11aa-4250-89c6-cfa2e0bb7aa2",
+            "Room": "Room::1983e000-11aa-4250-89c6-cfa2e0bb7aa2",
             "_attachments" : {
                 "tavolo_vuoto_100": {
                     "content_type": 'image\/svg+xml',
