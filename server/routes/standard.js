@@ -20,16 +20,15 @@ const appRouter = function (app) {
 
         });
     });
-    app.post("/api/table/set/var", function (req, res) {
-       bucket.counter(req.body.variable,req.body.delta,{initial: 0},function (err, r) {
-            res.json(r)
-       })
+    app.post("/api/set/var", function (req, res) {
+
     });
-    app.post("/api/table/get/var", function (req, res) {
+    app.post("/api/get/var", function (req, res) {
         bucket.get(req.body.variable,function (err, r) {
             res.json(r)
         })
     });
+
 };
 
 module.exports = appRouter;

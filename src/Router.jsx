@@ -36,13 +36,18 @@ const Header = () => (
     </Navbar>
 );
 
+const setDefault = (room) => {
+    return (room)?room:'Room::1983e957-11aa-4250-89c6-cfa2e0bb7aa2';
+}
 const BasicExample = () => (
     <Router history={browserHistory}>
         <div>
             <Header/>
             <Switch>
                 <Route exact path="/" component={Home}/>
-                <Route path="/room" component={Room}/>
+                <Route path="/room">
+                    <Room setDefault={setDefault} />
+                </Route>
                 <Redirect from="/stanze" to="/room"/>
                 <Route component={NoMatch}/>
             </Switch>

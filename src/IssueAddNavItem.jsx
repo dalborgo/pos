@@ -10,6 +10,17 @@ import Toast from './Toast.jsx';
 import api from './api'
 
 const a = new api();
+
+
+function Rooms(props) {
+    let r = props.righe.map(tab => <option value={tab.id} key={tab.id}>{tab.key}</option>);
+    return (
+        <FormControl componentClass="select" placeholder="select" name="room">
+            {r}
+        </FormControl>
+    );
+}
+
 class IssueAddNavItem extends React.Component {
     constructor(props) {
         super(props);
@@ -17,7 +28,8 @@ class IssueAddNavItem extends React.Component {
             showing: false,
             init: false,
             toastVisible: false, toastMessage: '',
-            toastType: 'success'
+            toastType: 'success',
+            rooms:[]
         };
         this.showModal = this.showModal.bind(this);
         this.hideModal = this.hideModal.bind(this);
@@ -27,7 +39,7 @@ class IssueAddNavItem extends React.Component {
     }
 
     showModal() {
-        if(!this.state.init)
+        if (!this.state.init)
             this.setState({showing: true, init: true});
     }
 
@@ -42,18 +54,28 @@ class IssueAddNavItem extends React.Component {
     dismissToast() {
         this.setState({toastVisible: false});
     }
+    componentWillMount() {
+        a.getView('rooms', 'all', '').then(
+            (res) => {
+                let stanze = res.rows;
+                this.setState({rooms: stanze});
+            }
+        );
+    }
 
     submit(e) {
         e.preventDefault();
         this.hideModal();
         const form = document.forms.issueAdd;
         const doc = {
-            name: form.title.value,
-            display: form.owner.value
+            name: form.name.value,
+            display: form.display.value,
+            room: form.room.value
         };
-        const path=this.props.location.pathname
-        a.createTable(doc).then( (res)=>{
-            if(path!=='/room')
+        const path = this.props.location.pathname
+        a.createTable(doc).then((res) => {
+            a.addTableToRoom(res.Room, res._id);
+            if (path !== '/room')
                 this.props.history.push('/room')
         })
     }
@@ -68,12 +90,16 @@ class IssueAddNavItem extends React.Component {
                     <Modal.Body>
                         <Form name="issueAdd">
                             <FormGroup>
-                                <ControlLabel>Title</ControlLabel>
-                                <FormControl name="title" autoFocus/>
+                                <ControlLabel>Name</ControlLabel>
+                                <FormControl name="name" autoFocus/>
                             </FormGroup>
                             <FormGroup>
-                                <ControlLabel>Owner</ControlLabel>
-                                <FormControl name="owner"/>
+                                <ControlLabel>Display</ControlLabel>
+                                <FormControl name="display"/>
+                            </FormGroup>
+                            <FormGroup controlId="formControlsSelect">
+                                <ControlLabel>Room</ControlLabel>
+                                <Rooms righe={this.state.rooms}/>
                             </FormGroup>
                         </Form>
                     </Modal.Body>

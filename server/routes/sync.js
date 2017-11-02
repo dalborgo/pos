@@ -1,7 +1,7 @@
 import Swagger from 'swagger-client';
 import config from '../../config/config.json';
 import fs from 'fs';
-import spec from '../../static/sg/sync-gateway-public-1-4_admin.json';
+import spec from '../../static/sg/sync-gateway-admin-1-4.json';
 import {v4} from 'uuid';
 spec.host = config.couchbase.sync_server_admin;
 function getBase64(path){
@@ -210,14 +210,14 @@ const appRouter = function (app) {
         //let tavolo2=getBase64('./static/imgs/tavolo.png');
         const name = req.body.name;
         const display = req.body.display;
+        const room = req.body.room;
         let body = {
             "_id": "Table::" + v4(),
             "type": "Table",
             "name": name,
             "display": display,
             "rgb": [0, 0, 0],
-            "image": "",
-            "Room": "Room::1983e000-11aa-4250-89c6-cfa2e0bb7aa2",
+            "Room": room,
             "_attachments" : {
                 "tavolo_vuoto_100": {
                     "content_type": 'image\/svg+xml',
@@ -419,7 +419,21 @@ const appRouter = function (app) {
         });
         //res.end()
     });
-
+    app.get("/api/sync/create/views", function (req, res) {
+        let body = {"views": {"all": {"map": "function(doc, meta) {if (doc.type == \"Room\") {emit(doc.display, null);}}"}}}
+        client.apis.query.put__db___design__ddoc_({db: config.couchbase.sync_db, body: body,ddoc:'rooms'}).then(function (userRes) {
+            console.log(userRes.statusText);
+        }).catch(function (err) {
+            console.log(err);
+        });
+        body = {"views": {"all": {"map": "function(doc, meta) {if (doc.type == \"Table\") {emit(doc.id, doc);}}"}}}
+        client.apis.query.put__db___design__ddoc_({db: config.couchbase.sync_db, body: body,ddoc:'tables'}).then(function (userRes) {
+            console.log(userRes.statusText);
+        }).catch(function (err) {
+            console.log(err);
+        });
+        res.send('ok')
+    });
     app.post("/api/sync/user/create", function (req, res) {
         let type = "User";
         const user = req.body.user;
@@ -431,8 +445,6 @@ const appRouter = function (app) {
             "surname": "Dal Borgo",
             "user": "dalborgo",
             "password":password,
-            "big_image": "",
-            "small_image": "",
             "role": "administrator"
         };
         client.apis.document.post({db: config.couchbase.sync_db, body: body}).then(function (userRes) {
@@ -452,8 +464,6 @@ const appRouter = function (app) {
             "surname": "Dal Borgo",
             "user": post.user,
             "password": post.password,
-            "big_image": "",
-            "small_image": "",
             "role": "administrator"
         };
         client.apis.document.post({db: config.couchbase.sync_db, body: body}).then(function (userRes) {

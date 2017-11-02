@@ -5,7 +5,7 @@ import Swagger from 'swagger-client';
 import config from '../config/config.json';
 import request from 'request';
 import GridListExampleSingleLine from './GridListExampleSingleLine.jsx';
-import spec from '../static/sg/sync-gateway-public-1-4_public.json';
+//import spec from '../static/sg/sync-gateway-public-1-4_public.json';
 import {Nav, NavItem} from 'react-bootstrap';
 import api from './api'
 
@@ -13,7 +13,7 @@ const a = new api();
 const poll = {
     longpoll: function (that) {
         function getChanges(seq) {
-            console.log('seq %s', seq)
+            console.log('seq %s', seq);
             let url = `http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}`;
             fetch(url + `/_changes?include_docs=true&feed=longpoll&filter=sync_gateway/bychannel&channels=tables,rooms&limit=1&since=${seq}`, {})
                 .then((res) => res.json())
@@ -21,7 +21,7 @@ const poll = {
                     let m = res.results;
                     console.log('Tavoli ' + m.length);
                     if (m.length > 0) {
-                        console.log('CARICA2')
+                        console.log('CARICA2');
                         that.loadData(false);
                         getChanges(res.last_seq);
                     }
@@ -82,13 +82,12 @@ function Rooms(props) {
 }
 
 export default class IssueList extends React.Component {
-    constructor() {
-        super();
-        //let ro = ['Room::1983e957-11aa-4250-89c6-cfa2e0bb7aa2', 'Room::1983e000-11aa-4250-89c6-cfa2e0bb7aa2']
+    constructor(props) {
+        super(props);
         this.state = {
             tables: [],
             rooms: [],
-            room: 'Room::1983e957-11aa-4250-89c6-cfa2e0bb7aa2'
+            room: this.props.setDefault()
         };
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleSelect = this.handleSelect.bind(this);

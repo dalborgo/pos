@@ -3,7 +3,7 @@
   "info": {
     "title": "Sync Gateway",
     "description": "Documentation for the Sync Gateway Admin REST API. This page is generated from the Sync Gateway Admin Swagger spec, the exact same information is also available at [developer.couchbase.com/mobile/swagger/sync-gateway-admin](http://developer.couchbase.com/mobile/swagger/sync-gateway-admin/).\n",
-    "version": "1.4"
+    "version": "1.3"
   },
   "host": "localhost:4985",
   "schemes": [
@@ -61,8 +61,7 @@
       "in": "body",
       "description": "The request body",
       "schema": {
-        "type": "string",
-        "format": "binary"
+        "type": "object"
       }
     },
     "bulkget": {
@@ -101,12 +100,6 @@
       "type": "string",
       "required": false
     },
-    "content_type": {
-      "in": "header",
-      "name": "Content-Type",
-      "description": "Attachment Content-Type",
-      "type": "string"
-    },
     "db": {
       "name": "db",
       "in": "path",
@@ -138,7 +131,7 @@
     "doc_ids": {
       "in": "query",
       "name": "doc_ids",
-      "description": "A list of document IDs as a valid JSON array. The response will be filtered to only documents with these IDs. This parameter must be used with the `filter=_doc_ids` and `feed=normal` parameters.",
+      "description": "A list of document IDs as a valid JSON array. The response will be filtered to only documents with these IDs. (This parameter must be used with the _doc_ids filter parameter; see below.)",
       "type": "array",
       "items": {
         "type": "string"
@@ -157,20 +150,6 @@
       "description": "Default is 'normal'. Specifies type of change feed. Valid values are normal, continuous, longpoll, websocket.",
       "type": "string",
       "default": "normal"
-    },
-    "group": {
-      "in": "query",
-      "name": "group",
-      "description": "Group the results using the reduce function to a group or single row.",
-      "type": "boolean",
-      "default": false
-    },
-    "group_level": {
-      "in": "query",
-      "name": "group_level",
-      "description": "Specify the group level to be used.",
-      "type": "integer",
-      "required": false
     },
     "heartbeat": {
       "in": "query",
@@ -212,7 +191,7 @@
     "new_edits": {
       "name": "new_edits",
       "in": "query",
-      "description": "Default is true. Setting this to false indicates that the request body is an already-existing revision that should be directly inserted into the database, instead of a modification to apply to the current document. (This mode is used by the replicato.) This option must be used in conjunction with the `_revisions` property in the request body.",
+      "description": "Default is true. Setting this to false indicates that the request body is an already-existing revision that should be directly inserted into the database, instead of a modification to apply to the current document. (This mode is used by the replicato.)",
       "type": "boolean",
       "default": true
     },
@@ -233,17 +212,10 @@
       "type": "string",
       "required": false
     },
-    "rev_delete": {
-      "name": "rev",
-      "in": "query",
-      "description": "Revision identifier of the revision to delete. It must be the identifier of the latest revision in the history.",
-      "type": "string",
-      "required": true
-    },
     "revs": {
       "in": "query",
       "name": "revs",
-      "description": "Default is false. Indicates whether to include a _revisions property for each document in the response, which contains a revision history of the document. The length of the returned revision tree can be specified with the `revs_limit` querystring parameter.",
+      "description": "Default is false. Indicates whether to include a _revisions property for each document in the response, which contains a revision history of the document.",
       "type": "boolean",
       "default": false
     },
@@ -327,8 +299,7 @@
             "description": "List containing new or updated documents. Each object in the array can contain the following properties _id, _rev, _deleted, and values for new and updated documents.",
             "type": "array",
             "items": {
-              "type": "object",
-              "$ref": "#/definitions/Document"
+              "type": "object"
             }
           },
           "new_edits": {
@@ -415,70 +386,6 @@
       "type": "string",
       "required": false
     },
-    "logtags": {
-      "in": "body",
-      "name": "body",
-      "description": "Log keys to enable or disable.",
-      "schema": {
-        "type": "object",
-        "properties": {
-          "*": {
-            "type": "boolean",
-            "description": "Enabling log key \"*\" enables all logging tags automatically"
-          },
-          "Access": {
-            "type": "boolean",
-            "description": "access() calls made by the sync function"
-          },
-          "Attach": {
-            "type": "boolean",
-            "description": "Attachment processing"
-          },
-          "Auth": {
-            "type": "boolean",
-            "description": "Authentication"
-          },
-          "Bucket": {
-            "type": "boolean",
-            "description": "Sync Gateway interactions with the bucket (verbose logging)."
-          },
-          "Cache": {
-            "type": "boolean",
-            "description": "Interactions with Sync Gateway's in-memory channel cache (Cache+ for verbose logging)"
-          },
-          "Changes": {
-            "type": "boolean",
-            "description": "Processing of _changes requests (Changes+ for verbose logging)"
-          },
-          "CRUD": {
-            "type": "boolean",
-            "description": "Updates made by Sync Gateway to documents (CRUD+ for verbose logging)"
-          },
-          "DCP": {
-            "type": "boolean",
-            "description": "DCP-feed processing (verbose logging)"
-          },
-          "Events": {
-            "type": "boolean",
-            "description": "Event processing (webhooks) (Events+ for verbose logging)"
-          },
-          "Feed": {
-            "type": "boolean",
-            "description": "Server-feed processing (Feed+ for verbose logging)"
-          },
-          "HTTP": {
-            "type": "boolean",
-            "description": "All requests made to the Sync Gateway REST APIs (Sync and Admin). Note that the log keyword HTTP is always enabled, which means that HTTP requests and error responses are always logged (in a non-verbose manner). HTTP+ provides more verbose HTTP logging."
-          }
-        }
-      }
-    },
-    "loglevel": {
-      "in": "query",
-      "name": "level",
-      "description": "Verbosity of the logging. The default value is 1 which is regular logging. level=2 enables warnings and \npanics logging and level=3 will log panics only.\n",
-      "type": "integer"
-    },
     "name": {
       "in": "path",
       "name": "name",
@@ -524,21 +431,9 @@
           "cancel": {
             "type": "boolean",
             "description": "Indicates that a running replication task should be cancelled, the running task is identified by passing its replication_id or by passing the original source and target values."
-          },
-          "changes_feed_limit": {
-            "type": "integer",
-            "description": "The maximum number of change entries to pull in each loop of a continuous changes feed.",
-            "default": 50
           }
         }
       }
-    },
-    "revs_limit": {
-      "in": "query",
-      "name": "revs_limit",
-      "description": "The number of revisions to include in the response from the document history. This parameter is only honoured if the `revs=true` querystring parameter is also sent in the request. If `revs=true` is specified and `revs_limit` isn't, the full revision history is returned.",
-      "type": "integer",
-      "required": false
     },
     "show_exp": {
       "in": "query",
@@ -617,11 +512,7 @@
         ],
         "responses": {
           "200": {
-            "description": "The message body contains the attachment, in the format specified in the Content-Type header.",
-            "schema": {
-              "type": "string",
-              "format": "binary"
-            }
+            "description": "The message body contains the attachment, in the format specified in the Content-Type header."
           },
           "304": {
             "description": "Not Modified, the attachment wasn't modified if ETag equals the If-None-Match header"
@@ -637,17 +528,6 @@
         ],
         "summary": "Add or update document",
         "description": "This request adds or updates the supplied request content as an attachment to the specified document. The attachment name must be a URL-encoded string (the file name). You must also supply either the rev query parameter or the If-Match HTTP header for validation, and the Content-Type headers (to set the attachment content type).\n\n  When uploading an attachment using an existing attachment name, the corresponding stored content of the database will be updated. Because you must supply the revision information to add an attachment to the document, this serves as validation to update the existing attachment.\n\n  Uploading an attachment updates the corresponding document revision. Revisions are tracked for the parent document, not individual attachments.\n",
-        "parameters": [
-          {
-            "$ref": "#/parameters/rev"
-          },
-          {
-            "$ref": "#/parameters/body"
-          },
-          {
-            "$ref": "#/parameters/content_type"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Operation completed successfully",
@@ -672,7 +552,7 @@
           "database"
         ],
         "summary": "Bulk docs",
-        "description": "This request enables you to add, update, or delete multiple documents to a database in a single request. To add new documents, you can either specify the ID (`_id`) or let the software create an ID. To update existing documents, you must provide the document ID, revision identifier (`_rev`), and new document values. To delete existing documents you must provide the document ID, revision identifier, and the deletion flag (`_deleted`).\n\nThe JSON returned by the `_bulk_docs` operation consists of an array of JSON structures, one for each document in the original submission. The returned JSON structure should be examined to ensure that all of the documents submitted in the original request were successfully added to the database.\n",
+        "description": "This request enables you to add, update, or delete multiple documents to a database in a single request. To add new documents, you can either specify the ID (_id) or let the software create an ID. To update existing documents, you must provide the document ID, revision identifier (_rev), and new document values. To delete existing documents you must provide the document ID, revision identifier, and the deletion flag (_deleted).\n",
         "parameters": [
           {
             "$ref": "#/parameters/bulkdocs"
@@ -680,18 +560,12 @@
         ],
         "responses": {
           "201": {
-            "description": "Documents have been created or updated. The response object is an array with the status for each document submitted in the original request.",
+            "description": "Documents have been created or updated",
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/BulkDocsSuccess"
+                "$ref": "#/definitions/Success"
               }
-            }
-          },
-          "409": {
-            "description": "The operation failed with a forbidden error. Probably because the document already exists in the database but a revision number wasn't specified.",
-            "schema": {
-              "$ref": "#/definitions/Forbidden"
             }
           }
         }
@@ -731,9 +605,6 @@
             "$ref": "#/parameters/revs"
           },
           {
-            "$ref": "#/parameters/revs_limit"
-          },
-          {
             "$ref": "#/parameters/attachments"
           },
           {
@@ -751,26 +622,6 @@
                   "items": {
                     "$ref": "#/definitions/Success"
                   }
-                }
-              }
-            }
-          },
-          "301": {
-            "description": "Request failed with a forbidden error. This usually happens because the user requesting that document doesn't have access to it. Access to documents is granted to users through channels.",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "_id": {
-                  "type": "string",
-                  "description": "The document ID that was requested"
-                },
-                "_removed": {
-                  "type": "boolean",
-                  "default": true
-                },
-                "_rev": {
-                  "type": "string",
-                  "description": "The revision number that was requested"
                 }
               }
             }
@@ -919,14 +770,6 @@
       }
     },
     "/{db}/{doc}": {
-      "parameters": [
-        {
-          "$ref": "#/parameters/db"
-        },
-        {
-          "$ref": "#/parameters/doc"
-        }
-      ],
       "get": {
         "tags": [
           "document"
@@ -946,6 +789,12 @@
           },
           {
             "$ref": "#/parameters/show_exp"
+          },
+          {
+            "$ref": "#/parameters/db"
+          },
+          {
+            "$ref": "#/parameters/doc"
           }
         ],
         "summary": "Get document",
@@ -954,7 +803,7 @@
           "200": {
             "description": "The message body contains the following objects in a JSON document.",
             "schema": {
-              "type": "object"
+              "$ref": "#/definitions/Success"
             }
           }
         }
@@ -966,7 +815,7 @@
         "parameters": [
           {
             "in": "body",
-            "name": "Document",
+            "name": "body",
             "description": "Request body",
             "schema": {
               "$ref": "#/definitions/Document"
@@ -977,10 +826,16 @@
           },
           {
             "$ref": "#/parameters/rev"
+          },
+          {
+            "$ref": "#/parameters/db"
+          },
+          {
+            "$ref": "#/parameters/doc"
           }
         ],
         "summary": "Create or update document",
-        "description": "This request creates a new document or creates a new revision of an existing document. It enables you to specify the identifier for a new document rather than letting the software create an identifier. If you want to create a new document and let the software create an identifier, use the POST /db request.\nIf the document specified by doc does not exist, a new document is created and assigned the identifier specified in doc. If the document already exists, the document is updated with the JSON document in the message body and given a new revision.\n\nSince Sync Gateway 1.3, an expiry property (`_exp`) can also be specified to purge the document after a given time.\n",
+        "description": "This request creates a new document or creates a new revision of an existing document. It enables you to specify the identifier for a new document rather than letting the software create an identifier. If you want to create a new document and let the software create an identifier, use the POST /db request.\nIf the document specified by doc does not exist, a new document is created and assigned the identifier specified in doc. If the document already exists, the document is updated with the JSON document in the message body and given a new revision.\n",
         "responses": {
           "200": {
             "description": "The response is a JSON document that contains the following objects",
@@ -996,7 +851,13 @@
         ],
         "parameters": [
           {
-            "$ref": "#/parameters/rev_delete"
+            "$ref": "#/parameters/rev"
+          },
+          {
+            "$ref": "#/parameters/db"
+          },
+          {
+            "$ref": "#/parameters/doc"
           }
         ],
         "summary": "Delete document",
@@ -1080,18 +941,6 @@
           },
           {
             "in": "query",
-            "name": "group",
-            "description": "Group the results using the reduce function to a group or single row.",
-            "type": "boolean"
-          },
-          {
-            "in": "query",
-            "name": "group_level",
-            "description": "Specify the group level to be used.",
-            "type": "integer"
-          },
-          {
-            "in": "query",
             "name": "key",
             "description": "If this parameter is provided, return only document that match the specified key.",
             "type": "string"
@@ -1147,6 +996,31 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "query"
+        ],
+        "summary": "Query a view",
+        "description": "Executes the specified view function from the specified design document. Unlike GET /{db}/{design-doc-id}/_view/{view} for accessing views, the POST method supports the specification of explicit keys to be retrieved from the view results. The remainder of the POST view functionality is identical to the GET /{db}/{design-doc-id}/_view/{view} API.\n",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "keys",
+            "description": "List of identifiers of the documents to retrieve",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 OK"
+          }
+        }
       }
     },
     "/{db}/_all_docs": {
@@ -1157,7 +1031,7 @@
       ],
       "get": {
         "tags": [
-          "database"
+          "query"
         ],
         "summary": "All docs",
         "description": "This request returns a built-in view of all the documents in the database.\n",
@@ -1201,7 +1075,7 @@
       },
       "post": {
         "tags": [
-          "database"
+          "query"
         ],
         "summary": "All docs",
         "description": "This request retrieves specified documents from the database.\n",
@@ -1466,52 +1340,6 @@
         }
       }
     },
-    "/{db}/_revs_diff": {
-      "parameters": [
-        {
-          "$ref": "#/parameters/db"
-        }
-      ],
-      "post": {
-        "summary": "Used by the replicator",
-        "description": "Given a set of document/revision IDs, returns the subset of those that do not correspond to revisions stored in the database.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "description": "Request body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "a_doc_id": {
-                  "type": "array",
-                  "description": "An array of revision IDs for that document."
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The request was successful",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "a_doc_id": {
-                  "type": "object",
-                  "properties": {
-                    "missing": {
-                      "type": "array",
-                      "description": "A list of revision IDs for that document (the ones that are not stored in the database)."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/_config": {
       "get": {
         "tags": [
@@ -1548,11 +1376,11 @@
         "tags": [
           "server"
         ],
-        "summary": "Get logging tags",
+        "summary": "Logging tags",
         "description": "Get logging tags of running instance.\n",
         "responses": {
           "200": {
-            "description": "The response is a set of key-value pairs. The key is a log tag and the value is a boolean to indicate whether this tag is enabled.\n",
+            "description": "Logging tags",
             "schema": {
               "$ref": "#/definitions/LogTags"
             }
@@ -1563,39 +1391,21 @@
         "tags": [
           "server"
         ],
-        "summary": "Set all logging tags",
-        "description": "Enabling logging for a tag provides additional diagnostic information for that logging area.\n\nThe PUT request replaces all existing logging tags with the ones specified in the request body.\n",
+        "summary": "Specify logging tags",
+        "description": "Log keys specify functional areas. Enabling logging for a log key provides additional diagnostic information for that area.\n\nFollowing are descriptions of the log keys that you can specify as a comma-separated list in the Log property. In some cases, a log key has two forms, one with a plus sign (+) suffix and one without, for example CRUD+ and CRUD. The log key with the plus sign logs more verbosely. For example for CRUD+, the log contains all of the messages for CRUD and additional ones for CRUD+.\n",
         "parameters": [
           {
-            "$ref": "#/parameters/loglevel"
-          },
-          {
-            "$ref": "#/parameters/logtags"
+            "in": "body",
+            "name": "LoggingBody",
+            "description": "The request body.",
+            "schema": {
+              "$ref": "#/definitions/LogTags"
+            }
           }
         ],
         "responses": {
-          "201": {
-            "description": "The operation was successful"
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "server"
-        ],
-        "summary": "Set individual logging tags",
-        "description": "Enabling logging for a tag provides additional diagnostic information for that logging area.\n\nThe POST request only updates the tags specified in the request body.\n",
-        "parameters": [
-          {
-            "$ref": "#/parameters/loglevel"
-          },
-          {
-            "$ref": "#/parameters/logtags"
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "The operation was successful"
+          "200": {
+            "description": "The logging tags were successfully updated."
           }
         }
       }
@@ -1623,17 +1433,17 @@
       }
     },
     "/{db}/": {
-      "parameters": [
-        {
-          "$ref": "#/parameters/db"
-        }
-      ],
       "get": {
         "tags": [
           "database"
         ],
         "summary": "Database info",
         "description": "This request retrieves information about the database.\n",
+        "parameters": [
+          {
+            "$ref": "#/parameters/db"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Request completed successfully.",
@@ -1664,6 +1474,9 @@
             "schema": {
               "type": "object"
             }
+          },
+          {
+            "$ref": "#/parameters/db"
           }
         ],
         "responses": {
@@ -1680,7 +1493,12 @@
           "database"
         ],
         "summary": "Create database",
-        "description": "This request creates a database.\nYou can optionally pass the database config as the JSON body. For example:\n\n  {\n    \"server\":\"http://localhost:8091\",\n    \"bucket\": \"todo_app\",\n    \"users\": {\n      \"john\": {\"password\": \"pass\", \"admin_channels\": [\"*\"]}\n    }\n  }\n\nNote that if you pass the entire config file it won't work, it must be the database portion only (the database name is specified in the URL path). If the parameters passed are invalid it will create a walrus-backed database with all values set to default.\nBy default, the database that is created is brought online immediately. To create the database and keep it offline, include the configuration property `offline` with the value `true` in the database configuration properties for the database that you are posting in the request body.\n",
+        "description": "This request creates a database.\nYou can optionally pass the database config as the JSON body. For example:\n\n  {\n    \"server\":\"http://localhost:8091\",\n    \"bucket\": \"todo_app\",\n    \"users\": {\n      \"john\": {\"password\": \"pass\", \"admin_channels\": [\"*\"]}\n    }\n  }\n\nNote that if you pass the entire config file it won't work, it must be the database portion only (the database name is specified in the URL path). If the parameters passed are invalid it will create a walrus-backed database with all values set to default.\n",
+        "parameters": [
+          {
+            "$ref": "#/parameters/db"
+          }
+        ],
         "responses": {
           "201": {
             "description": "The database was created successfully."
@@ -1714,7 +1532,7 @@
           "database"
         ],
         "summary": "Compact the database",
-        "description": "Triggers a compaction process. Compaction is defined as the process of purging the JSON bodies of non-leaf revisions. As shown on the diagram below, only properties with a leading underscore (`_` is the character to denote properties reserved for Couchbase) are kept to construct the revision tree.\n\n  ![](https://cl.ly/1Q1F0i3f2i3n/compaction.gif)\n\nNote that compaction on Sync Gateway is running periodically in the background (every 5 minutes). So calling this endpoint manually on the Admin REST API is not necessary.\n\nThe compaction process does not remove JSON bodies of leaf nodes (conflicting branches). Hence, it is important to resolve conflicts in your application in order to re-claim disk space when the compaction process is executed.\n",
+        "description": "This request deletes obsolete backup revisions. When a new revision is created, the body of the previous non-conflicting revision is temporarily stored in a separate document. These backup documents are set to expire after 5 minutes. Calling the _compact endpoint will remove these backup documents immediately.\n",
         "responses": {
           "200": {
             "description": "Request completed successfully.",
@@ -1862,7 +1680,7 @@
           "database"
         ],
         "summary": "This request takes the specified database offline.",
-        "description": "An offline database is not accessible through Sync Gateway's Public REST API. However, some commands can be given to Sync Gateway through the Admin REST API.\n\nTaking a database offline will:\n\n- Cleanly closes all active `_changes` feeds for this database.\n- Rejects all access to the database through the Public REST API (503 Service Unavailable).\n- Rejects most Admin API requests (503 Service Unavailable). A specific, short list of Admin REST API requests remain available (`GET /{db}`, `PUT /{db}/_config`, `POST /{db}/_resync`).\n- Stops webhook event handlers.\n- Does not take the backing Couchbase Server bucket offline. The bucket remains available and Sync Gateway keeps its connection to the bucket.\n\nWhen a database is offline, you can load configuration properties for the database, without stopping and re-starting the Sync Gateway instance. The new configuration properties are applied when the database is brought online.\n\nTaking a database offline that is in the progress of coming online will take the database offline after it comes online.\n\nFor more information about taking a database offline and bringing it back online, see [this guide](../../../guides/sync-gateway/database-offline/index.html).\n",
+        "description": "Taking a database offline:\n\n- Cleanly closes all active _changes feeds for this database.\n- Rejects all access to the database through the Public REST API (503 Service Unavailable).\n- Rejects most Admin API requests (503 Service Unavailable). Sync Gateway processes a small set of Admin API \nrequests.\n- Does not take the backing Couchbase Server bucket offline. The bucket remains available and Sync Gateway \nkeeps its connection to the bucket.\n\nFor more information about taking a database offline and bringing it back online, see Taking databases offline and bringing them online.\n",
         "responses": {
           "200": {
             "description": "Database brought online"
@@ -1881,7 +1699,7 @@
           "database"
         ],
         "summary": "Bring a database online.",
-        "description": "When a database is online, Sync Gateway serves both Public and Admin REST API requests for the database. This request brings the specified database online, either immediately or after a specified delay.\n\nBringing a database online:\n\n- Closes the datbases connection to the backing Couchbase Server bucket.\n- Reloads the databse configuration, and connects to the backing Cocuhbase Server bucket.\n- Re-establishes access to the database from the Public REST API.\n- Accepts all Admin API requests.\n\nYou can bring an offline database online after a specific delay. Uses for this include:\n\n- Making a database available for Couchbase Mobile clients at a specific time.\n- Making databases on several Sync Gateway instances available at the same time.\n\nFor more information about taking a database offline and bringing it back online, see [this guide](../../../guides/sync-gateway/database-offline/index.html).\n",
+        "description": "This request brings the specified database online, either immediately or after a specified delay.\n\nBringing a database online:\n\n- Closes the datbases connection to the backing Couchbase Server bucket.\n- Reloads the databse configuration, and connects to the backing Cocuhbase Server bucket.\n- Re-establishes access to the database from the Public REST API.\n- Accepts all Admin API reqieste.\n\nFor more information about taking a database offline and bringing it back online, see Taking databases \noffline and bringing them online.\n",
         "parameters": [
           {
             "in": "body",
@@ -1920,7 +1738,7 @@
           "document"
         ],
         "summary": "Purge document",
-        "description": "The purge command provides a way to remove a document from the bucket itself. The operation removes all the revisions (active and tombstones) for the specified document(s). A common usage of this endpoint is to remove tombstone documents that are no longer needed, thus recovering storage space and reducing data replicated to clients. Other clients are not notified when a revision has been purged; so in order to purge a revision from the system it must be done from all databases (on Couchbase Lite and Sync Gateway).\n",
+        "description": "When an application deletes a document a tombstone revision is created, over time the number of tombstones can become significant. Tombstones allow document deletions to be propagated to other clients via replication. For some applications the replication of a tombstone may not be useful after a period of time. The purge command provides a way to remove the tombstones from a Sync Gateway database, recovering storage space and reducing the amount of data replicated to clients.\n",
         "parameters": [
           {
             "in": "body",
@@ -2085,10 +1903,7 @@
                 },
                 "all_channels": {
                   "type": "array",
-                  "description": "All the channels that this role has access to.",
-                  "items": {
-                    "type": "string"
-                  }
+                  "description": "All the channels that this role has access to."
                 }
               }
             }
@@ -2139,7 +1954,7 @@
           "session"
         ],
         "summary": "Creates a new session",
-        "description": "If the credentials provided in the request body are valid, the session is created with an idle session timeout of 24 hours. An idle session timeout in the context of Sync Gateway is defined as the following: if 10% or more of the current expiration time has elapsed when a subsequent request with that session id is processed, the session's expiry time is automatically updated to 24 hours from that time.\n",
+        "description": "This request creates a new session in the specified database.\n",
         "parameters": [
           {
             "in": "body",
@@ -2575,25 +2390,6 @@
         }
       }
     },
-    "Forbidden": {
-      "type": "object",
-      "properties": {
-        "error": {
-          "type": "string",
-          "default": "conflict"
-        },
-        "id": {
-          "type": "string"
-        },
-        "reason": {
-          "type": "string"
-        },
-        "status": {
-          "type": "integer",
-          "default": 409
-        }
-      }
-    },
     "LogTags": {
       "type": "object",
       "properties": {
@@ -2649,27 +2445,11 @@
       "properties": {
         "a_doc_id": {
           "type": "array",
-          "description": "Only possible value is `[\"*\"]`. It permanently removes all revisions for that document ID.",
+          "description": "List containing the revision numbers to purge for the given docID. Passing \"*\" as an item in the array will remove all the revisions for that document.",
           "items": {
             "type": "string",
-            "description": "Only possible value is `\"*\"`. It permanently removes all revisions for that document ID.",
-            "enum": [
-              "*"
-            ]
+            "description": "Revision ID to delete or \"*\" to delete all the revisions of the document."
           }
-        }
-      }
-    },
-    "BulkDocsSuccess": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Design document identifier"
-        },
-        "rev": {
-          "type": "string",
-          "description": "Revision identifier"
         }
       }
     },
@@ -2717,14 +2497,6 @@
             "description": "Role name"
           }
         },
-        "all_channels": {
-          "type": "array",
-          "description": "Array of channel names the user is given access to",
-          "items": {
-            "type": "string",
-            "description": "Channel name"
-          }
-        },
         "email": {
           "type": "string",
           "description": "Email of the user that will be created."
@@ -2732,14 +2504,6 @@
         "disabled": {
           "type": "boolean",
           "description": "Boolean property to disable this user. The user will not be able to login if this property is set to true."
-        },
-        "roles": {
-          "type": "array",
-          "description": "Array of role names the user is given access to",
-          "items": {
-            "type": "string",
-            "description": "Role name"
-          }
         }
       }
     },
@@ -2806,19 +2570,15 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The ID of the document."
+          "description": "The ID of the document"
         },
         "key": {
           "type": "object",
-          "description": "The key in the output row."
+          "description": "The key in the output row"
         },
         "value": {
           "type": "object",
-          "description": "The value in the output row."
-        },
-        "doc": {
-          "type": "object",
-          "description": "The document body. This is only returned if `include_docs=true` is specified in the URL."
+          "description": "The value in the output row"
         }
       }
     },
@@ -2918,23 +2678,6 @@
         "_exp": {
           "type": "string",
           "description": "Expiry time after which the document will be purged. The expiration time is set and managed on the Couchbase Server document (TTL is not supported for databases in walrus mode). The value can be specified in two ways; in ISO-8601 format, for example the 6th of July 2016 at 17:00 in the BST timezone would be 2016-07-06T17:00:00+01:00; it can also be specified as a numeric Couchbase Server expiry value. Couchbase Server expiries are specified as Unix time, and if the desired TTL is below 30 days then it can also represent an interval in seconds from the current time (for example, a value of 5 will remove the document 5 seconds after it is written to Couchbase Server). The document expiration time is returned in the response of GET /{db}/{doc} when show_exp=true is included in the querystring.\n\nAs with the existing explicit purge mechanism, this applies only to the local database; it has nothing to do with replication. This expiration time is not propagated when the document is replicated. The purge of the document does not cause it to be deleted on any other database.\n"
-        },
-        "_revisions": {
-          "type": "object",
-          "properties": {
-            "start": {
-              "type": "integer",
-              "description": "Prefix number for the latest revision."
-            },
-            "ids": {
-              "type": "array",
-              "description": "Array of valid revision IDs, in reverse order (latest first).",
-              "items": {
-                "type": "string",
-                "description": "A revision ID."
-              }
-            }
-          }
         }
       }
     },
@@ -2945,7 +2688,7 @@
           "type": "string",
           "description": "Starting index of the returned rows."
         },
-        "rows": {
+        "row": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/QueryRow"

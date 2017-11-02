@@ -41,8 +41,11 @@ const styles = {
 function GridListExampleSingleLine(props) {
     function carica(id) {
 
-        a.getTable(id).then(
-            (res)=> a.deleteTable(res))
+        a.getDoc(id).then(
+            (res)=> {
+                a.deleteDoc(res);
+                a.removeTableFromRoom(res.Room, res._id);
+            })
        /* let url = `http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}`;
         fetch(url + '/' + id, {})
             .then((res) => res.json())
@@ -61,7 +64,7 @@ function GridListExampleSingleLine(props) {
                     {tilesData.map((tile) => (
                         <GridTile
                             key={tile.id}
-                            title={tile.value.name}
+                            title={tile.value.display}
                             actionIcon={<IconButton onClick={() => carica(tile.id)}><StarBorder
                                 color="white"/></IconButton>}
                             titleStyle={styles.titleStyle}
