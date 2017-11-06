@@ -15,6 +15,7 @@ const poll = {
         function getChanges(seq) {
             console.log('seq %s', seq);
             let url = `http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}`;
+            console.log('Attesa tavoli');
             fetch(url + `/_changes?include_docs=true&feed=longpoll&filter=sync_gateway/bychannel&channels=tables,rooms&limit=1&since=${seq}`, {})
                 .then((res) => res.json())
                 .then((res) => {
@@ -59,9 +60,10 @@ const poll = {
 
 //spec.host = config.couchbase.sync_server;
 
+
 const Table = (props) => (
-    <div><img
-        src={`http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}/${props.tables.id}/tavolo_vuoto_100`}/><br/>{props.tables.value.name}
+    <div>
+        <img src={`http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}/${props.tables.id}/`+(props.tables.value.order)?'tavolo_pieno_100':'tavolo_vuoto_100'}/><br/>{props.tables.value.order}
     </div>
 );
 

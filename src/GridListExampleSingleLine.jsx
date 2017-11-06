@@ -57,6 +57,11 @@ function GridListExampleSingleLine(props) {
     }
 
     let tilesData = props.tables;
+
+    function tav(p) {
+        return (p)?'tavolo_pieno_100':'tavolo_vuoto_100'
+    }
+
     return (
         <div style={styles.root}>
             <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
@@ -72,7 +77,7 @@ function GridListExampleSingleLine(props) {
                             style={styles.gridTile}
                         >
                             <img
-                                src={`http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}/${tile.id}/tavolo_vuoto_100`}/>
+                                src={`http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}/${tile.id}/`+tav(tile.value.order)}/>
                         </GridTile>
                     ))}
                 </GridList>

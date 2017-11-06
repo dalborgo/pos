@@ -1,4 +1,5 @@
 import SourceMapSupport from 'source-map-support';
+
 SourceMapSupport.install();
 import 'babel-polyfill';
 import couchbase from 'couchbase';
@@ -8,6 +9,7 @@ import session from 'express-session';
 import path from 'path';
 import express from 'express';
 import bodyParser from 'body-parser';
+import stampa from './stampa';
 import config from '../config/config.json';
 
 const app = express();
@@ -32,7 +34,7 @@ app.use(session({
 
 const myBucket = (new couchbase.Cluster(config.couchbase.server)).openBucket(config.couchbase.bucket);
 ottoman.store = new ottoman.CbStoreAdapter(myBucket, couchbase);
-module.exports = {store:ottoman.store, bucket:myBucket};
+module.exports = {store: ottoman.store, bucket: myBucket};
 //module.exports.bucket = myBucket;
 
 /*couchbaseStore.on('connect', function () {
@@ -40,6 +42,7 @@ module.exports = {store:ottoman.store, bucket:myBucket};
 });*/
 
 app.use(cookieParser());
+
 
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -50,9 +53,34 @@ app.use(function (req, res, next) {
 const user = require("./routes/sync")(app);
 const standard = require("./routes/standard")(app);
 
-/*app.get('*', (req, res) => {
+//const print = require("./routes/print")(app);
+
+function getChanges(seq) {
+    console.log('seq %s', seq);
+    let url = `http://${config.couchbase.sync_server_public}/${config.couchbase.sync_db}`;
+    console.log('Attesa print');
+    fetch(url + `/_changes?include_docs=true&feed=longpoll&filter=sync_gateway/bychannel&channels=prints&since=${seq}`, {})
+        .then((res) => res.json())
+        .then((res) => {
+            let m = res.results;
+            console.log('Print ' + m.length);
+            if (m.length > 0) {
+                console.log('PRINT ACCEPTED');
+                m.map(r => {stampa(r)});
+                getChanges(res.last_seq);
+            }
+        });
+}
+
+
+myBucket.get('_sync:seq', function (err, r) {
+    getChanges(r.value);
+});
+
+
+app.get('*', (req, res) => {
     res.sendFile(path.resolve('static/index.html'));
-});*/
+});
 //ottoman.store = module.exports.store;
 
 ottoman.ensureIndices(function (error) {

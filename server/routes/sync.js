@@ -206,8 +206,8 @@ const appRouter = function (app) {
         res.send(tavolo);
     });
     app.post("/api/sync/table/create", function (req, res) {
-        let tavolo=getBase64('./static/svg/meal2.svg');
-        //let tavolo2=getBase64('./static/imgs/tavolo.png');
+        let tavolo=getBase64('./static/svg/tab_vuoto.svg');
+        let tavolo2=getBase64('./static/svg/tab_pieno.svg');
         const name = req.body.name;
         const display = req.body.display;
         const room = req.body.room;
@@ -225,7 +225,7 @@ const appRouter = function (app) {
                 },
                 "tavolo_pieno_100": {
                     "content_type": 'image\/svg+xml',
-                    "data": tavolo
+                    "data": tavolo2
                 }
             }
         };
