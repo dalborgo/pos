@@ -29,11 +29,11 @@ function updateDoc(doc) {
     );
 }
 
-function updateStatusPrint(order, exit) {
+function updateStatusPrint(order, exit, status) {
     return getDoc(order._id).then(
         res => {
-            res.entries = _.each(res.entries, f => f.print_status = 'printed');
-            res.exits = _.each(res.exits, f => f.status = (f.exit === exit) ? 'printed' : f.status);
+            res.entries = _.each(res.entries, f => f.print_status = status);
+            res.exits = _.each(res.exits, f => f.status = (f.exit === exit) ? status : f.status);
             return updateDoc(res);
         }
     )
@@ -51,8 +51,12 @@ function al(s, d, t = 42) {
 const myBucket = (new couchbase.Cluster(config.couchbase.server)).openBucket(config.couchbase.bucket);
 export default function (p) {
     //const device = new escpos.Network(config.printer.ip);
-    p.doc.status='ACCEPTED';
+    //p.doc.status='ACCEPTED';
+    console.log('ACCEPTED');
+    const order = p.doc.order;
+    const exit = p.doc.exit;
     //updateDoc(p.doc);
+    updateStatusPrint(order, exit, 'accepted').then(r => console.log(r));
     const device = new escpos.Console();
     const printer = new escpos.Printer(device);
     device.open(function () {
@@ -62,10 +66,7 @@ export default function (p) {
             .align('ct')
             .text(p.id).flush();
         console.log('PRINTED');
-        const order = p.doc.order;
-        const exit = p.doc.exit;
-        // console.log(order);
-        updateStatusPrint(order, exit).then(r => console.log(r));
+        updateStatusPrint(order, exit, 'printed').then(r => console.log(r));
     });
     printer.close();
 
