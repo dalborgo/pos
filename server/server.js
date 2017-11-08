@@ -11,7 +11,6 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import stampa from './stampa';
 import config from '../config/config.json';
-const N1qlQuery = couchbase.N1qlQuery;
 const app = express();
 app.use(express.static('static'));
 app.use(bodyParser.json());
@@ -89,10 +88,7 @@ req.on('row', function(row) {
     console.log('Got a row',row);
 });*/
 
-const query = N1qlQuery.fromString("SELECT * FROM `risto` t WHERE _type='Stampante' AND ARRAY_CONTAINS(categories, $1)");
-myBucket.query(query, ['sala'], function(err, rows) {
-    for (let row of rows) { console.log('Name: %s.', row.t.ip); }
-});
+
 
 ottoman.ensureIndices(function (error) {
     if (error) {

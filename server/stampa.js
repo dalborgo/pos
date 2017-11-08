@@ -3,6 +3,7 @@ import moment from 'moment'
 import config from '../config/config.json';
 import couchbase from 'couchbase';
 
+const N1qlQuery = couchbase.N1qlQuery;
 moment.locale('it');
 import _ from 'underscore'
 
@@ -39,6 +40,32 @@ function updateStatusPrint(order, exit, status) {
     )
 }
 
+function getPrinter(ord, exit) {
+    const query = N1qlQuery.fromString("SELECT r.ip, t product_category FROM risto r UNNEST categories t where r._type='Stampante'");
+
+    myBucket.query(query, function (err, prn) {
+        //console.log(rows)
+        let res = [];
+        //console.log(prn)
+        ord.entries.forEach(function (p) {
+            let r = _.where(prn, {"product_category": p.product_category});
+            r.forEach(function (s) {
+                if (res[s.ip])
+                    res[s.ip].push({name: p.product_name});
+                else {
+                    res[s.ip] = [];
+                    res[s.ip].push({name: p.product_name})
+                }
+            })
+        });
+        //console.log(res)
+        for (let pr in res) {
+            console.log(pr);
+            print(ord,exit,res[pr],pr)
+        }
+    });
+}
+
 function al(s, d, t = 42) {
     let ns = t - s.length - d.length;
     let sp = '';
@@ -48,27 +75,39 @@ function al(s, d, t = 42) {
     return s + sp + d;
 }
 
-const myBucket = (new couchbase.Cluster(config.couchbase.server)).openBucket(config.couchbase.bucket);
-export default function (p) {
-    //const device = new escpos.Network(config.printer.ip);
-    //p.doc.status='ACCEPTED';
-    console.log('ACCEPTED');
-    const order = p.doc.order;
-    const exit = p.doc.exit;
-    //updateDoc(p.doc);
-    updateStatusPrint(order, exit, 'accepted').then(r => console.log(r));
-    const device = new escpos.Console();
+function print(order, exit,p,ip) {
+    const device = new escpos.Network(ip);
+    //const device = new escpos.Console();
     const printer = new escpos.Printer(device);
     device.open(function () {
         printer
             .encode('850')
             .font('B')
-            .align('ct')
-            .text(p.id).flush();
+            .align('ct');
+        let out='';
+        p.forEach(a=>{
+           printer.text(a.name);
+        });
+        printer.flush();
         console.log('PRINTED');
-        updateStatusPrint(order, exit, 'printed').then(r => console.log(r));
+        //updateStatusPrint(order, exit, 'printed').then(r => console.log(r));
     });
     printer.close();
+}
+
+const myBucket = (new couchbase.Cluster(config.couchbase.server)).openBucket(config.couchbase.bucket);
+export default function (p) {
+
+    //p.doc.status='ACCEPTED';
+    const order = p.doc.order;
+    const exit = p.doc.exit;
+    getPrinter(order, exit);
+    //console.log('balumba '+prn);
+    console.log('ACCEPTED');
+    //updateDoc(p.doc);
+    //updateStatusPrint(order, exit, 'accepted').then(r => console.log(r));
+    //print(order,exit)
+
 
 };
 

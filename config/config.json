@@ -21,7 +21,7 @@
     "sync_db": "risto"
   },
   "printer": {
-    "ip": "10.0.0.115"
+    "ip": "10.0.0.116"
   },
   "salt": "ASTEN"
 }
