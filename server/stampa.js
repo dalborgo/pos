@@ -30,18 +30,28 @@ function updateDoc(doc) {
     );
 }
 
-function updateStatusPrint(order, exit, status) {
+function updateStatusAll(order, exit, status) {
     return getDoc(order._id).then(
         res => {
             res.entries = _.each(res.entries, f => f.print_status = status);
-            res.exits = _.each(res.exits, f => f.status = (f.exit === exit) ? status : f.status);
+            res.exits = _.each(res.exits, f => f.status = f.exit === exit ? status : f.status);
+            return updateDoc(res);
+        }
+    )
+}
+function updateStatusPrint(order, exit, status, lista) {
+    return getDoc(order._id).then(
+        res => {
+            res.entries = _.each(res.entries, f => f.print_status = lista.indexOf(f.product_id) >= 0 ? status : f.print_status);
+            res.exits = _.each(res.exits, f => f.status = f.exit === exit ? status : f.status);
+            //console.log(res)
             return updateDoc(res);
         }
     )
 }
 
 function getPrinter(ord, exit) {
-    const query = N1qlQuery.fromString("SELECT r.ip, t product_category FROM risto r UNNEST categories t where r._type='Stampante'");
+    const query = N1qlQuery.fromString("SELECT r.ip, r.name, t product_category FROM "+config.couchbase.sync_db+" r UNNEST categories t where r._type='Stampante'");
 
     myBucket.query(query, function (err, prn) {
         //console.log(rows)
@@ -51,10 +61,10 @@ function getPrinter(ord, exit) {
             let r = _.where(prn, {"product_category": p.product_category});
             r.forEach(function (s) {
                 if (res[s.ip])
-                    res[s.ip].push({name: p.product_name});
+                    res[s.ip].push({name: p.product_name, id: p.product_id, stampante: s.name});
                 else {
                     res[s.ip] = [];
-                    res[s.ip].push({name: p.product_name})
+                    res[s.ip].push({name: p.product_name, id: p.product_id, stampante: s.name})
                 }
             })
         });
@@ -76,9 +86,11 @@ function al(s, d, t = 42) {
 }
 
 function print(order, exit,p,ip) {
-    const device = new escpos.Network(ip);
-    //const device = new escpos.Console();
+    //const device = new escpos.Network(ip);
+    const device = new escpos.Console();
     const printer = new escpos.Printer(device);
+
+    let printed = [];
     device.open(function () {
         printer
             .encode('850')
@@ -86,11 +98,15 @@ function print(order, exit,p,ip) {
             .align('ct');
         let out='';
         p.forEach(a=>{
+           console.log(a.stampante);
+           console.log(a.name);
+           printed.push(a.id);
            printer.text(a.name);
         });
         printer.flush();
         console.log('PRINTED');
-        //updateStatusPrint(order, exit, 'printed').then(r => console.log(r));
+        console.log(printed);
+        updateStatusPrint(order, exit, 'PRINTED', printed).then(r => console.log(r));
     });
     printer.close();
 }
@@ -101,11 +117,14 @@ export default function (p) {
     //p.doc.status='ACCEPTED';
     const order = p.doc.order;
     const exit = p.doc.exit;
-    getPrinter(order, exit);
-    //console.log('balumba '+prn);
     console.log('ACCEPTED');
+    updateStatusAll(order, exit, 'ACCEPTED').then(r => {
+        console.log(r);
+        getPrinter(order, exit);
+    });
+
+    //console.log('balumba '+prn);
     //updateDoc(p.doc);
-    //updateStatusPrint(order, exit, 'accepted').then(r => console.log(r));
     //print(order,exit)
 
 

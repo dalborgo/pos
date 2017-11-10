@@ -92,11 +92,11 @@ const appRouter = function (app) {
         let body = {
             "_id": "Room::" + v4(),
             "type": "Room",
-            "name": "Room 1",
-            "display": "Attico",
+            "name": "Room 2",
+            "display": "Salone",
             "rgb": [0, 0, 0],
             "image": "",
-            "tables": ["Table::" + v4(), "Table::" + v4()]
+            "tables": []
         };
         client.apis.document.post({db: config.couchbase.sync_db, body: body}).then(function (userRes) {
             console.log(userRes)
@@ -172,7 +172,7 @@ const appRouter = function (app) {
             "category": "Category::80e7f07c-beaa-42aa-98ca-5ed4d701da09",
             "variants": [],
             "vat_department_id": "VAT::3b4e95f1-31de-426e-947c-22ff08151828",
-            "price": ["Catalog::" + v4(), 4000]
+            "price": [{catalog:"Catalog::865e2a9d-850b-4413-adf2-f1010331b903", price: 14000},{catalog:"Catalog::caf6f43a-0087-4d8f-90ff-2f5c81ce13a6", price: 12000}]
         };
         client.apis.document.post({db: config.couchbase.sync_db, body: body}).then(function (userRes) {
             console.log(userRes)

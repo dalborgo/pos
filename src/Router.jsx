@@ -37,7 +37,7 @@ const Header = () => (
 );
 
 const setDefault = (room) => {
-    return (room)?room:'Room::1983e957-11aa-4250-89c6-cfa2e0bb7aa2';
+    return (room)?room:'Room::fe276048-67f3-4cc6-94b3-c13575620e75';
 }
 const BasicExample = () => (
     <Router history={browserHistory}>

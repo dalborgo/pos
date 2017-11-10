@@ -66,8 +66,8 @@ function getChanges(seq) {
             if (m.length > 0) {
                 console.log('PRINT ACCEPTED');
                 m.map(r => {stampa(r)});
-                getChanges(res.last_seq);
             }
+            getChanges(res.last_seq);
         });
 }
 
@@ -77,7 +77,7 @@ myBucket.get('_sync:seq', function (err, r) {
 });
 
 
-app.get('*', (req, res) => {
+app.get('/*', (req, res) => {
     res.sendFile(path.resolve('static/index.html'));
 });
 
